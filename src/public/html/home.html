@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>SoundClone Home</title>
+  <link rel="stylesheet" href="../css/home.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">🎵 SoundClone</div>
+    <div class="auth-buttons" id="authArea"></div>
+  </header>
+  <main class="main-content">
+    <h2 class="album-row-title">More of what you like</h2>
+    <div class="album-row">
+      <a href="index.html" class="album-link">
+        <div class="album-cover-container">
+          <img src="../assets/albumart.jpg" alt="Darling Dance Cover" class="album-cover-img" />
+          <div class="album-overlay">
+            <span class="play-btn">▶</span>
+          </div>
+        </div>
+        <div class="album-caption">Kairikibear - Darling Dance</div>
+      </a>
+      </div>
+  </main>
+  <script>
+    function renderAuth() {
+      const p = JSON.parse(localStorage.getItem('profile'));
+      const area = document.getElementById('authArea');
+      if (p) {
+        area.innerHTML = `
+          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <img src="${p.img}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee;border:1px solid #bbb;" alt="프로필" />
+            <span style="font-size:16px;color:#fff;font-weight:bold;">${p.name}</span>
+            <button onclick="logout()" style="margin-left:8px;padding:5px 16px;border-radius:5px;background:#444;color:#fff;border:none;cursor:pointer;">로그아웃</button>
+          </div>
+        `;
+      } else {
+        area.innerHTML = `
+          <button class="auth-btn" onclick="window.location.href='login.html'">로그인</button>
+          <button class="auth-btn" onclick="window.location.href='signup.html'">회원가입</button>
+        `;
+      }
+    }
+    function logout() {
+      localStorage.removeItem('profile');
+      renderAuth();
+    }
+    renderAuth();
+  </script>
+</body>
+</html>

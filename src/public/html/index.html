@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>SoundClone 플레이바 + 볼륨 슬라이더 완전체</title>
+  <link rel="stylesheet" href="../css/index.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+  <header class="navbar">
+    <div class="logo">🎵 SoundClone</div>
+    <nav>
+      <ul class="menu">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Stream</a></li>
+        <li><a href="#">Collection</a></li>
+      </ul>
+    </nav>
+    <div class="search-container">
+      <input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
+      <button class="search-btn">🔍</button>
+    </div>
+    <div class="user-buttons">
+      <button class="sign-in-btn">Sign in</button>
+      <button class="create-account-btn">Create account</button>
+      <button class="upload-btn">Upload</button>
+      <button class="more-btn">•••</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="player-section">
+      <div class="player-info">
+        <div id="current-track-info">
+          <div class="user-name" id="artist-name">Kairikibear</div>
+          <div class="track-title" id="track-title">Kairikibear - Darling Dance</div>
+        </div>
+        <div class="waveform-container">
+          <button id="play-pause-btn" aria-label="Play/Pause">
+            <span class="icon play">▶</span>
+            <span class="icon pause">⏸</span>
+          </button>
+          <canvas id="waveform"></canvas>
+          <div id="time-display">
+            <span id="current-time">0:00</span> / <span id="duration-time">0:00</span>
+          </div>
+        </div>
+      </div>
+      <div class="album-cover-container">
+        <img id="album-cover" src="../assets/albumart.jpg" alt="앨범 커버" />
+      </div>
+    </section>
+    <section class="tracklist-section">
+      <h2>곡 목록</h2>
+      <div id="tracklist"></div>
+    </section>
+  </main>
+
+  <footer class="player-bar">
+    <div class="player-bar-section">
+      <button id="footer-play-pause-btn" class="bar-btn" aria-label="Play/Pause">
+        <span class="icon play">▶</span>
+        <span class="icon pause">⏸</span>
+      </button>
+      <span id="footer-current-time">0:00</span>
+      <input type="range" id="progress-bar" min="0" max="100" value="0">
+      <span id="footer-duration-time">0:00</span>
+      <input type="range" id="volume-slider" min="0" max="100" value="80">
+      <span class="volume-icon">🔊</span>
+    </div>
+  </footer>
+  <script src="../js/player.js"></script>
+</body>
+
+</html>

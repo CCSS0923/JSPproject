@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+  <div class="signup-container">
+    <h2>로그인</h2>
+    <form id="loginForm" autocomplete="off">
+      <label for="loginId">아이디 혹은 이메일</label>
+      <input type="text" id="loginId" name="loginId" required />
+      
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" name="password" required />
+      <button type="submit">로그인</button>
+    </form>
+    <div id="login-error" style="color: #e66; margin-top: 8px;"></div>
+    <div class="login-link">
+      <a href="signup.html">계정이 없으신가요? 회원가입</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').onsubmit = async function(e) {
+      e.preventDefault();
+      
+      const loginId = document.getElementById('loginId').value.trim();
+      const password = document.getElementById('password').value;
+      const errorBox = document.getElementById('login-error');
+      errorBox.textContent = "";
+      
+      if (!loginId || !password) {
+        errorBox.textContent = "모든 필드를 입력하세요.";
+        return;
+      }
+      try {
+        const response = await fetch('http://localhost:3000/api/users/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ loginId: loginId, password: password })
+        });
+        const result = await response.json();
+        
+        if (response.ok) {
+          // --- 이 부분이 핵심입니다 ---
+          // 1. home.html이 사용할 객체를 만듭니다.
+          const profileData = {
+            name: result.user.nickname,      // 닉네임을 'name' 키에
+            img: result.user.profile_image   // 이미지 경로를 'img' 키에
+          };
+          
+          // 2. 'profile'이라는 키로 localStorage에 저장합니다.
+          localStorage.setItem('profile', JSON.stringify(profileData)); 
+          
+          // 3. home.html로 이동합니다.
+          location.href = "home.html";
+          // --------------------------
+
+        } else {
+          errorBox.textContent = result.message || "로그인 실패";
+        }
+      } catch (e) {
+        errorBox.textContent = "서버 오류가 발생했습니다.";
+      }
+    };
+  </script>
+</body>
+</html>
