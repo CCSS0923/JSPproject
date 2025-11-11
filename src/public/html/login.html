@@ -54,8 +54,12 @@
           // 2. 'profile'이라는 키로 localStorage에 저장합니다.
           localStorage.setItem('profile', JSON.stringify(profileData)); 
           
-          // 3. home.html로 이동합니다.
-          location.href = "home.html";
+          // 3. URL 파라미터에서 돌아갈 경로(returnTo)를 찾습니다.
+          const urlParams = new URLSearchParams(window.location.search);
+          const returnTo = urlParams.get('returnTo');
+
+          // 4. returnTo 값이 있으면 거기로, 없으면 기본값(home.html)으로 이동합니다.
+          location.href = returnTo || "home.html";
           // --------------------------
 
         } else {

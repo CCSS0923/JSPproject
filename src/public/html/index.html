@@ -22,11 +22,12 @@
       <input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
       <button class="search-btn">🔍</button>
     </div>
-    <div class="user-buttons">
-      <button class="sign-in-btn" onclick="location.href='login.html'">Sign in</button>
-      <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
+    
+    <div class="user-buttons" id="authArea">
       <button class="upload-btn" onclick="location.href='upload.html'">Upload</button>
       <button class="more-btn">•••</button>
+      <button class="sign-in-btn" onclick="location.href='login.html?returnTo=index.html'">Sign in</button>
+      <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
     </div>
   </header>
 
@@ -35,7 +36,7 @@
       <div class="player-info">
         <div id="current-track-info">
           <div class="user-name" id="artist-name">Kairikibear</div>
-          <div class="track-title" id="track-title">Kairikibear - Darling Dance</div>
+          <div class="track-title"id="track-title">Kairikibear - Darling Dance</div>
         </div>
         <div class="waveform-container">
           <button id="play-pause-btn" aria-label="Play/Pause">
@@ -72,6 +73,53 @@
     </div>
   </footer>
   <script src="../js/player.js"></script>
+
+  <script>
+    // --- 인증 UI 렌더링 스크립트 ---
+    function renderAuth() {
+      // 1. 로컬 스토리지에서 프로필 정보 가져오기
+      const p = JSON.parse(localStorage.getItem('profile'));
+      // 2. 제어할 영역(id="authArea") 가져오기
+      const area = document.getElementById('authArea');
+      
+      // 3. (중요) 로그인 상태와 관계없이 항상 유지되어야 하는 버튼 HTML 정의
+      const uploadBtnHtml = `<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>`;
+      const moreBtnHtml = `<button class="more-btn">•••</button>`;
+
+      if (p && area) {
+        // 4. 로그인 상태 (p가 존재할 때)
+        // [수정됨] Upload, More 버튼이 먼저 오도록 순서 변경
+        area.innerHTML = `
+          ${uploadBtnHtml}
+          ${moreBtnHtml}
+          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <img src="${p.img}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee;border:1px solid #bbb;" alt="프로필" />
+            <span style="font-size:16px;color:#fff;font-weight:bold;">${p.name}</span>
+            <button onclick="logout()" style="margin-left:8px;padding:5px 16px;border-radius:5px;background:#444;color:#fff;border:none;cursor:pointer;">로그아웃</button>
+          </div>
+        `;
+      } else if (area) {
+        // 5. 로그아웃 상태
+        // [수정됨] Upload, More 버튼이 먼저 오도록 순서 변경
+        area.innerHTML = `
+          ${uploadBtnHtml}
+          ${moreBtnHtml}
+          <button class="sign-in-btn" onclick="location.href='login.html?returnTo=index.html'">Sign in</button>
+          <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
+        `;
+      }
+    }
+
+    // 로그아웃 함수
+    function logout() {
+      localStorage.removeItem('profile');
+      renderAuth(); // UI 새로고침
+    }
+
+    // 6. 페이지 로드 시 즉시 인증 상태 확인 및 UI 렌더링 실행
+    renderAuth();
+    // --- 인증 스크립트 끝 ---
+  </script>
 </body>
 
 </html>

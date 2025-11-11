@@ -57,6 +57,12 @@ html {
   cursor: pointer;
 }
 
+.user-buttons {
+  display: flex;
+  align-items: center; /* 버튼과 프로필 높이를 중앙 정렬 */
+  gap: 8px; /* 요소들 사이의 간격을 8px로 설정 */
+}
+
 .user-buttons button {
   border: 1.5px solid white;
   background: transparent;
