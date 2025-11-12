@@ -1,0 +1,217 @@
+/* library.css (신규 파일)
+  - index.css와 home.css의 스타일을 일부 보완합니다. 
+*/
+
+body {
+  /* home.css와 유사하게 어두운 배경 적용 */
+  background: #181818;
+  color: white;
+}
+
+/* index.html의 헤더 링크 활성화 스타일 */
+.navbar .menu li a.active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 2. 라이브러리 탭 메뉴 */
+.library-nav {
+  width: 100%;
+  background-color: #232323; /* 헤더보다 약간 밝은 배경 */
+  border-bottom: 1px solid #333;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+.library-tabs {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.library-tabs li a {
+  display: block;
+  padding: 14px 4px;
+  color: #aaa;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+
+.library-tabs li a:hover {
+  color: #fff;
+}
+
+.library-tabs li a.tab-active {
+  color: #ff5500;
+  border-bottom-color: #ff5500;
+}
+
+/* 3. 메인 콘텐츠 */
+.library-content {
+  max-width: 1024px;
+  margin: 30px auto;
+  padding: 0 15px;
+}
+
+/* 4. 콘텐츠 섹션 */
+.content-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+}
+
+/* home.css의 .album-row 스타일을 재활용합니다. 
+  (가로 스크롤을 위해 overflow-x 추가)
+*/
+.album-row {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  overflow-x: auto; /* 가로 스크롤 */
+  padding-bottom: 10px;
+}
+
+/* home.css의 .album-link 스타일 재활용 */
+.album-link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #fff;
+  width: 170px; /* 고정 너비 */
+  flex-shrink: 0; /* 줄어들지 않도록 설정 */
+}
+
+.album-cover-container {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  border-radius: 8px; /* 약간 둥글게 */
+  overflow: hidden;
+  background: #333;
+  margin-bottom: 10px;
+  transition: transform 0.2s;
+}
+.album-cover-container:hover {
+  transform: scale(1.03);
+}
+
+.album-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.album-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.play-btn {
+  font-size: 50px;
+  color: #fff;
+}
+
+.album-link:hover .album-overlay {
+  opacity: 1;
+}
+
+.album-caption {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.album-artist {
+  color: #aaa;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+
+/* 5. 사용자 타일 (Following 섹션) */
+.user-row {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  overflow-x: auto; /* 가로 스크롤 */
+  padding-bottom: 10px;
+}
+
+.user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  width: 170px; /* 고정 너비 */
+  flex-shrink: 0; /* 줄어들지 않도록 설정 */
+}
+
+.user-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%; /* 원형 */
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: #333;
+  transition: transform 0.2s;
+}
+.user-avatar:hover {
+  transform: scale(1.03);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-name {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.user-followers {
+  color: #aaa;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* 6. 하단 푸터 */
+.library-footer {
+  text-align: center;
+  padding: 30px;
+  border-top: 1px solid #333;
+  color: #888;
+  font-size: 13px;
+}
+
+.library-footer a {
+  color: #aaa;
+  text-decoration: none;
+  margin: 0 5px;
+}
+
+.library-footer a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
