@@ -3,9 +3,187 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>SoundClone 플레이바 + 볼륨 슬라이더 완전체</title>
+  <title>SoundClone Track Page</title>
   <link rel="stylesheet" href="../css/index.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body,
+    html {
+      background: #000;
+      color: #ddd;
+    }
+
+    .navbar {
+      background: #111;
+    }
+
+    .menu li a {
+      color: #eee;
+    }
+
+    .menu li a:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .search-container input {
+      background: #222;
+      color: #eee;
+    }
+
+    .user-buttons button {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    .user-buttons button:hover {
+      background: #fff;
+      color: #111;
+    }
+
+    .main-content {
+      max-width: 1200px;
+      margin: 30px auto 80px;
+      padding: 0 24px;
+    }
+
+    .track-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(260px, 1fr);
+      gap: 24px;
+    }
+
+    .track-main {
+      min-width: 0;
+    }
+
+    .player-section {
+      background: linear-gradient(120deg, #333, #151515);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      color: #fff;
+    }
+
+    .tracklist-section {
+      margin-top: 20px;
+    }
+
+    #tracklist {
+      background: #111;
+      color: #eee;
+    }
+
+    .track-item {
+      background: transparent;
+      border-bottom: 1px solid #222;
+    }
+
+    .track-item:hover {
+      background: #181818;
+    }
+
+    .track-item.active {
+      background: #ff5500;
+      color: #fff;
+    }
+
+    .track-sidebar {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar-card {
+      background: #111;
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: #ddd;
+      font-size: 14px;
+    }
+
+    .sidebar-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .sidebar-track {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .sidebar-track img {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+
+    .sidebar-track-info {
+      font-size: 13px;
+    }
+
+    .sidebar-track-info .name {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .sidebar-track-info .artist {
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    .sidebar-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #222;
+      font-size: 12px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-top: 6px;
+      color: #aaa;
+    }
+
+    .sidebar-meta-row span strong {
+      color: #fff;
+    }
+
+    #time-display {
+      color: #fff;
+    }
+
+    #footer-current-time,
+    #footer-duration-time {
+      color: #ddd;
+    }
+
+    .volume-icon {
+      color: #fff;
+    }
+
+    .player-bar {
+      background: #111;
+      border-top: 1px solid #333;
+    }
+
+    @media (max-width: 900px) {
+      .track-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -21,7 +199,7 @@
       <input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
       <button class="search-btn">🔍</button>
     </div>
-    
+
     <div class="user-buttons" id="authArea">
       <button class="upload-btn" onclick="location.href='upload.html'">Upload</button>
       <button class="more-btn">•••</button>
@@ -31,31 +209,74 @@
   </header>
 
   <main class="main-content">
-    <section class="player-section">
-      <div class="player-info">
-        <div id="current-track-info">
-          <div class="user-name" id="artist-name">Kairikibear</div>
-          <div class="track-title"id="track-title">Kairikibear - Darling Dance</div>
-        </div>
-        <div class="waveform-container">
-          <button id="play-pause-btn" aria-label="Play/Pause">
-            <span class="icon play">▶</span>
-            <span class="icon pause">⏸</span>
-          </button>
-          <canvas id="waveform"></canvas>
-          <div id="time-display">
-            <span id="current-time">0:00</span> / <span id="duration-time">0:00</span>
+    <div class="track-layout">
+      <!-- 메인 플레이어 + 트랙리스트 -->
+      <div class="track-main">
+        <section class="player-section">
+          <div class="player-info">
+            <div id="current-track-info">
+              <div class="user-name" id="artist-name">Kairikibear</div>
+              <div class="track-title" id="track-title">Kairikibear - Darling Dance</div>
+            </div>
+            <div class="waveform-container">
+              <button id="play-pause-btn" aria-label="Play/Pause">
+                <span class="icon play">▶</span>
+                <span class="icon pause">⏸</span>
+              </button>
+              <canvas id="waveform"></canvas>
+              <div id="time-display">
+                <span id="current-time">0:00</span> /
+                <span id="duration-time">0:00</span>
+              </div>
+            </div>
+          </div>
+          <div class="album-cover-container">
+            <img id="album-cover" src="../assets/albumart.jpg" alt="앨범 커버" />
+          </div>
+        </section>
+
+        <section class="tracklist-section">
+          <h2>곡 목록</h2>
+          <div id="tracklist"></div>
+        </section>
+      </div>
+
+      <!-- 오른쪽 사이드바 -->
+      <aside class="track-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-title">Track info</div>
+          <div>Lilium Records · Single</div>
+          <div class="sidebar-meta-row">
+            <span><strong>3:27</strong> length</span>
+            <span><strong>Audio</strong></span>
+          </div>
+          <div class="sidebar-meta-row">
+            <span>Plays: <strong>—</strong></span>
+            <span>Likes: <strong>—</strong></span>
           </div>
         </div>
-      </div>
-      <div class="album-cover-container">
-        <img id="album-cover" src="../assets/albumart.jpg" alt="앨범 커버" />
-      </div>
-    </section>
-    <section class="tracklist-section">
-      <h2>곡 목록</h2>
-      <div id="tracklist"></div>
-    </section>
+
+        <div class="sidebar-card">
+          <div class="sidebar-title">Related tracks</div>
+          <div class="sidebar-track">
+            <img src="../assets/sample2_album.jpg" alt="related" />
+            <div class="sidebar-track-info">
+              <div class="name">두번째 곡 예시</div>
+              <div class="artist">artist 2</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-title">Tags</div>
+          <div>
+            <span class="sidebar-tag">electronic</span>
+            <span class="sidebar-tag">vocaloid</span>
+            <span class="sidebar-tag">j-pop</span>
+          </div>
+        </div>
+      </aside>
+    </div>
   </main>
 
   <footer class="player-bar">
@@ -65,29 +286,22 @@
         <span class="icon pause">⏸</span>
       </button>
       <span id="footer-current-time">0:00</span>
-      <input type="range" id="progress-bar" min="0" max="100" value="0">
+      <input type="range" id="progress-bar" min="0" max="100" value="0" />
       <span id="footer-duration-time">0:00</span>
-      <input type="range" id="volume-slider" min="0" max="100" value="80">
+      <input type="range" id="volume-slider" min="0" max="100" value="80" />
       <span class="volume-icon">🔊</span>
     </div>
   </footer>
-  <script src="../js/player.js"></script>
 
   <script>
-    // --- 인증 UI 렌더링 스크립트 ---
     function renderAuth() {
-      // 1. 로컬 스토리지에서 프로필 정보 가져오기
       const p = JSON.parse(localStorage.getItem('profile'));
-      // 2. 제어할 영역(id="authArea") 가져오기
       const area = document.getElementById('authArea');
-      
-      // 3. (중요) 로그인 상태와 관계없이 항상 유지되어야 하는 버튼 HTML 정의
+
       const uploadBtnHtml = `<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>`;
       const moreBtnHtml = `<button class="more-btn">•••</button>`;
 
       if (p && area) {
-        // 4. 로그인 상태 (p가 존재할 때)
-        // [수정됨] Upload, More 버튼이 먼저 오도록 순서 변경
         area.innerHTML = `
           ${uploadBtnHtml}
           ${moreBtnHtml}
@@ -95,30 +309,24 @@
             <img src="${p.img}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee;border:1px solid #bbb;" alt="프로필" />
             <span style="font-size:16px;color:#fff;font-weight:bold;">${p.name}</span>
             <button onclick="logout()" style="margin-left:8px;padding:5px 16px;border-radius:5px;background:#444;color:#fff;border:none;cursor:pointer;">Logout</button>
-          </div>
-        `;
+          </div>`;
       } else if (area) {
-        // 5. 로그아웃 상태
-        // [수정됨] Upload, More 버튼이 먼저 오도록 순서 변경
         area.innerHTML = `
           ${uploadBtnHtml}
           ${moreBtnHtml}
           <button class="sign-in-btn" onclick="location.href='login.html?returnTo=index.html'">Sign in</button>
-          <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
-        `;
+          <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>`;
       }
     }
-
-    // 로그아웃 함수
     function logout() {
       localStorage.removeItem('profile');
-      renderAuth(); // UI 새로고침
+      renderAuth();
     }
-
-    // 6. 페이지 로드 시 즉시 인증 상태 확인 및 UI 렌더링 실행
     renderAuth();
-    // --- 인증 스크립트 끝 ---
   </script>
+
+  <script src="../js/globalPlayer.js"></script>
+  <script src="../js/player.js"></script>
 </body>
 
 </html>

@@ -1,76 +1,292 @@
-const tracks = [
-  {
-    id: 1,
-    title: "Kairikibear - Darling Dance",
-    artist: "Kairikibear",
-    album: "Darling Dance 앨범",
-    // 경로 수정
-    audioSrc: "../assets/달링 댄스.mp3",
-    albumCover: "../assets/albumart.jpg"
-  },
-  {
-    id: 2,
-    title: "두번째 곡 예시",
-    artist: "artist 2",
-    album: "앨범 2",
-    // 경로 수정
-    audioSrc: "../assets/sample2.mp3",
-    albumCover: "../assets/sample2_album.jpg"
-  }
-];
+// player.js
+// globalPlayer(audio)와 각 페이지 UI를 연결하는 컨트롤러
 
-let currentTrackIndex = 0;
-const audio = new Audio();
-audio.crossOrigin = "anonymous";
+const GP = window.globalPlayer;
+const tracks = window.GlobalTracks || [];
 
-const canvas = document.getElementById("waveform");
-const ctx = canvas.getContext("2d");
-const playPauseBtn = document.getElementById("play-pause-btn");
-const currentTimeSpan = document.getElementById("current-time");
-const durationTimeSpan = document.getElementById("duration-time");
-const artistNameEl = document.getElementById("artist-name");
-const trackTitleEl = document.getElementById("track-title");
-const albumCoverEl = document.getElementById("album-cover");
-const tracklistContainer = document.getElementById("tracklist");
-
-const footerPlayPauseBtn = document.getElementById("footer-play-pause-btn");
-const progressBar = document.getElementById("progress-bar");
-const volumeSlider = document.getElementById("volume-slider");
-const footerCurrentTime = document.getElementById("footer-current-time");
-const footerDurationTime = document.getElementById("footer-duration-time");
-
-const volumeIcon = document.querySelector(".volume-icon");
-
-let audioContext;
-let animationId;
+let canvas, ctx;
 let waveformData = null;
-
-let isMuted = false;
-let previousVolume = 0.15; // 초기 볼륨 15%
-audio.volume = previousVolume;
-volumeSlider.value = previousVolume * 100;
+let playPauseBtn, footerPlayPauseBtn;
+let currentTimeSpan, durationTimeSpan;
+let artistNameEl, trackTitleEl, albumCoverEl;
+let tracklistContainer;
+let progressBar, volumeSlider;
+let footerCurrentTime, footerDurationTime;
+let volumeIcon;
 
 let isSeeking = false;
 
-function resizeCanvas() {
-  canvas.width = canvas.clientWidth * window.devicePixelRatio;
-  canvas.height = canvas.clientHeight * window.devicePixelRatio;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-}
-resizeCanvas();
-window.addEventListener("resize", () => {
-  resizeCanvas();
-  if (waveformData) drawBaseWaveform(waveformData);
+window.addEventListener("DOMContentLoaded", () => {
+  if (!GP || !tracks.length) return;
+  GP.init();
+
+  cacheElements();
+  bindEvents();
+  syncUIFromPlayer();
+  buildTracklist();
+  if (canvas) {
+    loadWaveform(tracks[GP.currentTrackIndex].audioSrc);
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      if (waveformData) drawBaseWaveform(waveformData);
+    });
+  }
 });
 
-canvas.addEventListener("click", (event) => {
-  if (!audio.duration) return;
-  const rect = canvas.getBoundingClientRect();
-  const clickX = event.clientX - rect.left;
-  const clickRatio = clickX / rect.width;
-  audio.currentTime = clickRatio * audio.duration;
-});
+// -----------------------
+// 요소 캐싱
+// -----------------------
+function cacheElements() {
+  canvas = document.getElementById("waveform");
+  if (canvas) {
+    ctx = canvas.getContext("2d");
+    resizeCanvas();
+  }
+
+  playPauseBtn = document.getElementById("play-pause-btn");
+  footerPlayPauseBtn = document.getElementById("footer-play-pause-btn");
+
+  currentTimeSpan = document.getElementById("current-time");
+  durationTimeSpan = document.getElementById("duration-time");
+
+  artistNameEl = document.getElementById("artist-name");
+  trackTitleEl = document.getElementById("track-title");
+  albumCoverEl = document.getElementById("album-cover");
+  tracklistContainer = document.getElementById("tracklist");
+
+  progressBar = document.getElementById("progress-bar");
+  volumeSlider = document.getElementById("volume-slider");
+  footerCurrentTime = document.getElementById("footer-current-time");
+  footerDurationTime = document.getElementById("footer-duration-time");
+
+  volumeIcon = document.querySelector(".volume-icon");
+
+  // 초기 볼륨 슬라이더
+  if (volumeSlider) {
+    volumeSlider.value = (GP.audio.volume || 0.8) * 100;
+  }
+}
+
+// -----------------------
+// 이벤트 바인딩
+// -----------------------
+function bindEvents() {
+  // 메인 플레이 버튼
+  if (playPauseBtn) {
+    playPauseBtn.onclick = () => {
+      GP.togglePlay();
+      updatePlayIcons();
+    };
+  }
+
+  // footer 플레이 버튼
+  if (footerPlayPauseBtn) {
+    footerPlayPauseBtn.onclick = () => {
+      GP.togglePlay();
+      updatePlayIcons();
+    };
+  }
+
+  // 볼륨 조절
+  if (volumeSlider) {
+    volumeSlider.addEventListener("input", (e) => {
+      const v = e.target.value / 100;
+      GP.setVolume(v);
+      updateVolumeIcon();
+    });
+  }
+
+  // 음소거 토글
+  if (volumeIcon) {
+    volumeIcon.addEventListener("click", () => {
+      if (GP.audio.volume > 0) {
+        sessionStorage.setItem("gp_prevVolume", GP.audio.volume);
+        GP.setVolume(0);
+        if (volumeSlider) volumeSlider.value = 0;
+      } else {
+        const prev = parseFloat(sessionStorage.getItem("gp_prevVolume"));
+        const v = !isNaN(prev) ? prev : 0.8;
+        GP.setVolume(v);
+        if (volumeSlider) volumeSlider.value = v * 100;
+      }
+      updateVolumeIcon();
+    });
+  }
+
+  // 진행바
+  if (progressBar) {
+    progressBar.addEventListener("input", (e) => {
+      isSeeking = true;
+      const displayTime = (e.target.value / 100) * GP.audio.duration;
+      if (footerCurrentTime) footerCurrentTime.textContent = formatTime(displayTime);
+    });
+
+    progressBar.addEventListener("change", (e) => {
+      isSeeking = false;
+      if (!isNaN(GP.audio.duration)) {
+        GP.audio.currentTime = (e.target.value / 100) * GP.audio.duration;
+      }
+    });
+  }
+
+  // 웨이브폼 클릭으로 탐색
+  if (canvas) {
+    canvas.addEventListener("click", (event) => {
+      if (!GP.audio.duration) return;
+      const rect = canvas.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const clickRatio = clickX / rect.width;
+      GP.audio.currentTime = clickRatio * GP.audio.duration;
+    });
+  }
+
+  // 오디오 이벤트
+  GP.audio.addEventListener("timeupdate", () => {
+    updateTimeAndProgress();
+    if (canvas && waveformData && GP.audio.duration) {
+      drawBaseWaveform(waveformData);
+      const progress = GP.audio.currentTime / GP.audio.duration;
+      drawProgressWaveform(waveformData, progress);
+    }
+  });
+
+  GP.audio.addEventListener("loadedmetadata", () => {
+    if (durationTimeSpan) durationTimeSpan.textContent = formatTime(GP.audio.duration);
+    if (footerDurationTime) footerDurationTime.textContent = formatTime(GP.audio.duration);
+  });
+
+  GP.audio.addEventListener("play", updatePlayIcons);
+  GP.audio.addEventListener("pause", updatePlayIcons);
+}
+
+// -----------------------
+// 트랙리스트
+// -----------------------
+function buildTracklist() {
+  if (!tracklistContainer) return;
+  tracklistContainer.innerHTML = "";
+
+  tracks.forEach((track, idx) => {
+    const div = document.createElement("div");
+    div.classList.add("track-item");
+    if (idx === GP.currentTrackIndex) div.classList.add("active");
+
+    div.innerHTML = `
+      <img src="${track.albumCover}" alt="앨범 커버" />
+      <div class="track-details">
+        <div class="title">${track.title}</div>
+        <div class="artist">${track.artist}</div>
+      </div>
+      <div class="play-icon">▶</div>
+    `;
+
+    div.onclick = () => {
+      if (idx !== GP.currentTrackIndex) {
+        GP.setTrack(idx);
+        highlightActiveTrack(idx);
+        if (canvas) {
+          loadWaveform(tracks[idx].audioSrc);
+        }
+        syncUIFromPlayer();
+      } else {
+        GP.togglePlay();
+      }
+      updatePlayIcons();
+    };
+
+    tracklistContainer.appendChild(div);
+  });
+}
+
+function highlightActiveTrack(activeIdx) {
+  if (!tracklistContainer) return;
+  const items = tracklistContainer.querySelectorAll(".track-item");
+  items.forEach((el, idx) => {
+    el.classList.toggle("active", idx === activeIdx);
+  });
+}
+
+// -----------------------
+// UI 동기화
+// -----------------------
+function syncUIFromPlayer() {
+  const idx = GP.currentTrackIndex;
+  const track = tracks[idx];
+
+  if (artistNameEl) artistNameEl.textContent = track.artist;
+  if (trackTitleEl) trackTitleEl.textContent = track.title;
+  if (albumCoverEl) albumCoverEl.src = track.albumCover;
+
+  if (tracklistContainer) highlightActiveTrack(idx);
+
+  updatePlayIcons();
+  updateTimeAndProgress();
+
+  updateVolumeIcon();
+
+  if (canvas && track.audioSrc) {
+    loadWaveform(track.audioSrc);
+  }
+}
+
+function updatePlayIcons() {
+  const isPlaying = !GP.audio.paused;
+
+  if (playPauseBtn) {
+    const p = playPauseBtn.querySelector(".play");
+    const s = playPauseBtn.querySelector(".pause");
+    if (p && s) {
+      p.style.display = isPlaying ? "none" : "inline";
+      s.style.display = isPlaying ? "inline" : "none";
+    }
+  }
+  if (footerPlayPauseBtn) {
+    const p = footerPlayPauseBtn.querySelector(".play");
+    const s = footerPlayPauseBtn.querySelector(".pause");
+    if (p && s) {
+      p.style.display = isPlaying ? "none" : "inline";
+      s.style.display = isPlaying ? "inline" : "none";
+    }
+  }
+}
+
+function updateTimeAndProgress() {
+  if (!GP.audio.duration) return;
+  const cur = GP.audio.currentTime;
+  const dur = GP.audio.duration;
+
+  if (!isSeeking && progressBar) {
+    const percent = (cur / dur) * 100;
+    progressBar.value = isNaN(percent) ? 0 : percent;
+  }
+
+  if (currentTimeSpan) currentTimeSpan.textContent = formatTime(cur);
+  if (durationTimeSpan) durationTimeSpan.textContent = formatTime(dur);
+
+  if (footerCurrentTime) footerCurrentTime.textContent = formatTime(cur);
+  if (footerDurationTime) footerDurationTime.textContent = formatTime(dur);
+}
+
+function updateVolumeIcon() {
+  if (!volumeIcon) return;
+  if (GP.audio.volume === 0) {
+    volumeIcon.textContent = "🔇";
+  } else {
+    volumeIcon.textContent = "🔊";
+  }
+}
+
+// -----------------------
+// 웨이브폼
+// -----------------------
+function resizeCanvas() {
+  if (!canvas || !ctx) return;
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = canvas.clientWidth * ratio;
+  canvas.height = canvas.clientHeight * ratio;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(ratio, ratio);
+}
 
 async function calculateWaveformData(audioURL, samples = 1200) {
   try {
@@ -91,18 +307,31 @@ async function calculateWaveformData(audioURL, samples = 1200) {
     }
     audioCtx.close();
     return filteredData;
-  } catch (error) {
-    console.error("파형 계산 중 오류:", error);
+  } catch (err) {
+    console.error("파형 계산 중 오류:", err);
     return null;
   }
 }
 
+async function loadWaveform(src) {
+  if (!canvas || !ctx) return;
+  waveformData = await calculateWaveformData(src);
+  if (waveformData) {
+    drawBaseWaveform(waveformData);
+  }
+}
+
 function drawBaseWaveform(data) {
-  const width = canvas.width / window.devicePixelRatio;
-  const height = canvas.height / window.devicePixelRatio;
+  if (!canvas || !ctx || !data) return;  // ★ 추가
+
+  const width = canvas.width / (window.devicePixelRatio || 1);
+  const height = canvas.height / (window.devicePixelRatio || 1);
+
   ctx.clearRect(0, 0, width, height);
+
   const barWidth = width / data.length;
-  ctx.fillStyle = "#cccccc";
+  ctx.fillStyle = "#555";
+
   data.forEach((value, i) => {
     const barHeight = value * height * 0.9;
     const x = i * barWidth;
@@ -112,11 +341,16 @@ function drawBaseWaveform(data) {
 }
 
 function drawProgressWaveform(data, progress) {
-  const width = canvas.width / window.devicePixelRatio;
-  const height = canvas.height / window.devicePixelRatio;
-  const progressIndex = Math.floor(data.length * progress);
-  ctx.fillStyle = "#ff5500";
+  if (!canvas || !ctx || !data) return;  // ★ 추가
+
+  const width = canvas.width / (window.devicePixelRatio || 1);
+  const height = canvas.height / (window.devicePixelRatio || 1);
+
   const barWidth = width / data.length;
+  const progressIndex = Math.floor(data.length * progress);
+
+  ctx.fillStyle = "#ff5500";
+
   for (let i = 0; i < progressIndex; i++) {
     const barHeight = data[i] * height * 0.9;
     const x = i * barWidth;
@@ -125,207 +359,15 @@ function drawProgressWaveform(data, progress) {
   }
 }
 
-function setPlayButtonPlaying(isPlaying) {
-  playPauseBtn.querySelector(".icon.play").style.display = isPlaying ? "none" : "inline";
-  playPauseBtn.querySelector(".icon.pause").style.display = isPlaying ? "inline" : "none";
-}
-
+// -----------------------
+// 유틸
+// -----------------------
 function formatTime(seconds) {
   if (isNaN(seconds)) return "0:00";
   const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+  const s = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, "0");
   return `${m}:${s}`;
 }
 
-async function setTrack(index) {
-  if (audioContext) {
-    audioContext.close();
-    audioContext = null;
-    cancelAnimationFrame(animationId);
-  }
-  currentTrackIndex = index;
-  const track = tracks[index];
-  artistNameEl.textContent = track.artist;
-  trackTitleEl.textContent = track.title;
-  albumCoverEl.src = track.albumCover;
-  currentTimeSpan.textContent = "0:00";
-  durationTimeSpan.textContent = "--:--";
-  setPlayButtonPlaying(false);
-  audio.src = track.audioSrc;
-  audio.load();
-  waveformData = await calculateWaveformData(track.audioSrc);
-  if (waveformData) drawBaseWaveform(waveformData);
-  buildTracklist();
-  highlightActiveTrack();
-}
-
-function buildTracklist() {
-  tracklistContainer.innerHTML = "";
-  tracks.forEach((track, idx) => {
-    const div = document.createElement("div");
-    div.classList.add("track-item");
-    if (idx === currentTrackIndex) div.classList.add("active");
-    div.setAttribute("data-index", idx);
-    div.innerHTML = `
-      <img src="${track.albumCover}" alt="앨범 커버" />
-      <div class="track-details">
-        <div class="title">${track.title}</div>
-        <div class="artist">${track.artist}</div>
-      </div>
-      <div class="play-icon">▶</div>
-    `;
-    div.onclick = () => {
-      if (idx !== currentTrackIndex) {
-        setTrack(idx).then(() => {
-          audio.play();
-          setPlayButtonPlaying(true);
-        });
-      } else {
-        if (audio.paused) {
-          audio.play();
-          setPlayButtonPlaying(true);
-        } else {
-          audio.pause();
-          setPlayButtonPlaying(false);
-        }
-      }
-      highlightActiveTrack();
-    };
-    tracklistContainer.appendChild(div);
-  });
-}
-
-function highlightActiveTrack() {
-  document.querySelectorAll(".track-item").forEach((el, idx) => {
-    el.classList.toggle("active", idx === currentTrackIndex);
-  });
-}
-
-playPauseBtn.onclick = async () => {
-  if (audioContext && audioContext.state === "suspended") {
-    await audioContext.resume();
-  }
-  if (audio.paused) {
-    audio.play();
-    setPlayButtonPlaying(true);
-  } else {
-    audio.pause();
-    setPlayButtonPlaying(false);
-  }
-};
-
-footerPlayPauseBtn.onclick = () => {
-  if (audio.paused) {
-    audio.play();
-    footerPlayPauseBtn.querySelector(".icon.play").style.display = "none";
-    footerPlayPauseBtn.querySelector(".icon.pause").style.display = "inline";
-  } else {
-    audio.pause();
-    footerPlayPauseBtn.querySelector(".icon.play").style.display = "inline";
-    footerPlayPauseBtn.querySelector(".icon.pause").style.display = "none";
-  }
-};
-
-audio.addEventListener("play", () => {
-  footerPlayPauseBtn.querySelector(".icon.play").style.display = "none";
-  footerPlayPauseBtn.querySelector(".icon.pause").style.display = "inline";
-});
-
-audio.addEventListener("pause", () => {
-  footerPlayPauseBtn.querySelector(".icon.play").style.display = "inline";
-  footerPlayPauseBtn.querySelector(".icon.pause").style.display = "none";
-});
-
-volumeSlider.addEventListener("input", (e) => {
-  audio.volume = volumeSlider.value / 100;
-  if (audio.volume > 0 && isMuted) {
-    isMuted = false;
-    updateVolumeIcon();
-  }
-});
-
-function toggleMute() {
-  if (isMuted) {
-    audio.volume = previousVolume;
-    volumeSlider.value = previousVolume * 100;
-    isMuted = false;
-  } else {
-    previousVolume = audio.volume;
-    audio.volume = 0;
-    volumeSlider.value = 0;
-    isMuted = true;
-  }
-  updateVolumeIcon();
-}
-
-function updateVolumeIcon() {
-  if (isMuted || audio.volume === 0) {
-    volumeIcon.textContent = "🔇";
-  } else {
-    volumeIcon.textContent = "🔊";
-  }
-}
-
-volumeIcon.addEventListener("click", () => {
-  toggleMute();
-});
-
-progressBar.addEventListener("input", (e) => {
-  isSeeking = true;
-  const displayTime = (e.target.value / 100) * audio.duration;
-  footerCurrentTime.textContent = formatTime(displayTime);
-});
-
-progressBar.addEventListener("change", (e) => {
-  isSeeking = false;
-  if (!isNaN(audio.duration)) {
-    audio.currentTime = (e.target.value / 100) * audio.duration;
-  }
-});
-
-audio.addEventListener("timeupdate", () => {
-  if (isSeeking) return;
-  const percent = (audio.currentTime / audio.duration) * 100;
-  progressBar.value = isNaN(percent) ? 0 : percent;
-  footerCurrentTime.textContent = formatTime(audio.currentTime);
-  footerDurationTime.textContent = formatTime(audio.duration);
-
-  currentTimeSpan.textContent = formatTime(audio.currentTime);
-  durationTimeSpan.textContent = formatTime(audio.duration);
-
-  if (waveformData) {
-    const progress = audio.currentTime / audio.duration;
-    drawBaseWaveform(waveformData);
-    drawProgressWaveform(waveformData, progress);
-  }
-});
-
-progressBar.addEventListener("change", (e) => {
-  if (!isNaN(audio.duration)) {
-    audio.currentTime = (e.target.value / 100) * audio.duration;
-  }
-});
-
-audio.addEventListener("loadedmetadata", () => {
-  durationTimeSpan.textContent = formatTime(audio.duration);
-  footerDurationTime.textContent = formatTime(audio.duration);
-});
-
-audio.addEventListener("ended", () => {
-  setPlayButtonPlaying(false);
-  footerPlayPauseBtn.querySelector(".icon.play").style.display = "inline";
-  footerPlayPauseBtn.querySelector(".icon.pause").style.display = "none";
-});
-
-window.addEventListener("resize", () => {
-  resizeCanvas();
-  if (waveformData) drawBaseWaveform(waveformData);
-});
-
-resizeCanvas();
-setTrack(currentTrackIndex);
-
-footerPlayPauseBtn.querySelector(".icon.play").style.display = "inline";
-footerPlayPauseBtn.querySelector(".icon.pause").style.display = "none";
-
-updateVolumeIcon();

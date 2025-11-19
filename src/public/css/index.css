@@ -102,7 +102,10 @@ html {
   padding: 20px;
   margin-bottom: 40px;
   color: white;
-  height: 180px;
+
+  height: 220px;
+  min-height: 220px;
+  padding-bottom: 20px;
 }
 
 .player-info {
@@ -134,21 +137,17 @@ html {
 #play-pause-btn {
   width: 48px;
   height: 48px;
-  margin-top: 90px;
+  margin-top: 20px;        /* ★ 원래 90px → 20px */
   border-radius: 50%;
   border: none;
   background-color: #ff5500;
   color: white;
   font-size: 25px;
-  font-weight: 700;
   cursor: pointer;
   flex-shrink: 0;
-  user-select: none;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
-  padding: 0;
 }
 
 #play-pause-btn .icon {
@@ -172,10 +171,8 @@ html {
 }
 
 #waveform {
-  flex-grow: 1;
-  margin-top: -100px;
-  height: 250px;
-  width: auto;
+  width: 100%;
+  height: 300px;
   border-radius: 4px;
   background: transparent;
   cursor: pointer;
@@ -183,20 +180,18 @@ html {
 
 .waveform-container {
   position: relative;
-  width: 800px;
-  margin-top: -80px;
+  width: 100%;
+  height: 25%;
+  margin-top: 60px;
   display: flex;
-  align-items: center;
-  gap: 5px;
+  align-items: flex-end;
+  gap: 12px;
   padding-right: 10px;
-  padding-left: 0;
 }
 
 #time-display {
-  margin-left: 0;
-  min-width: 80px;
+  min-width: 90px;
   font-size: 14px;
-  user-select: none;
   color: white;
 }
 
