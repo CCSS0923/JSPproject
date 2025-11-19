@@ -49,7 +49,7 @@ html {
 }
 
 .search-container input {
-  width: 500px;
+  width: 75%;
   padding: 6px;
   border-radius: 4px;
   border: none;
@@ -70,6 +70,8 @@ html {
 }
 
 .user-buttons button {
+  width: auto;
+  height: auto;
   border: 1.5px solid white;
   background: transparent;
   padding: 6px 10px;
@@ -129,17 +131,6 @@ html {
   width: fit-content;
 }
 
-.waveform-container {
-  position: relative;
-  width: 800px;
-  margin-top: -80px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding-right: 10px;
-  padding-left: 0;
-}
-
 #play-pause-btn {
   width: 48px;
   height: 48px;
@@ -184,10 +175,21 @@ html {
   flex-grow: 1;
   margin-top: -100px;
   height: 250px;
-  width: 500px;
+  width: auto;
   border-radius: 4px;
   background: transparent;
   cursor: pointer;
+}
+
+.waveform-container {
+  position: relative;
+  width: 800px;
+  margin-top: -80px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-right: 10px;
+  padding-left: 0;
 }
 
 #time-display {

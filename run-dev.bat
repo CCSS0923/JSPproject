@@ -1,3 +1,4 @@
+chcp 65001 >nul
 @echo off
 REM 배치 파일이 위치한 폴더(JSPproject)를 기준으로 경로 설정
 SET "NODE_DIR=%~dp0\node-v25.1.0-win-x64"
