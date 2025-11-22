@@ -9,32 +9,70 @@
   <div class="signup-container">
     <h2>음원 업로드</h2>
     <form id="uploadForm" enctype="multipart/form-data">
-      <label for="file">파일 선택</label>
-      <input type="file" id="file" name="file" accept="audio/*" required />
+      
+      <label for="title">곡 제목</label>
+      <input type="text" id="title" name="title" placeholder="예: Darling Dance" required />
+
+      <label for="artist">아티스트</label>
+      <input type="text" id="artist" name="artist" placeholder="예: Kairikibear" required />
+
+      <label for="imageFile">앨범 커버 이미지 (선택)</label>
+      <input type="file" id="imageFile" name="imageFile" accept="image/*" />
+
+      <label for="audioFile">오디오 파일 (mp3, wav)</label>
+      <input type="file" id="audioFile" name="audioFile" accept="audio/*" required />
+      
       <button type="submit">업로드</button>
     </form>
-    <div id="upload-status" style="margin-top:10px;"></div>
+
+    <div id="upload-status" style="margin-top:15px; text-align: center; font-weight: bold;"></div>
+    <div class="login-link">
+      <a href="home.html">홈으로 돌아가기</a>
+    </div>
   </div>
 
   <script>
     document.getElementById('uploadForm').onsubmit = async function(e) {
       e.preventDefault();
-      const fileInput = document.getElementById('file');
-      if (!fileInput.files.length) {
-        alert('파일을 선택하세요.');
+      
+      const title = document.getElementById('title').value;
+      const artist = document.getElementById('artist').value;
+      const imageInput = document.getElementById('imageFile'); // 이미지
+      const audioInput = document.getElementById('audioFile'); // 오디오
+      const statusDiv = document.getElementById('upload-status');
+
+      if (!audioInput.files.length) {
+        alert('오디오 파일을 선택하세요.');
         return;
       }
+
       const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
+      formData.append('title', title);
+      formData.append('artist', artist);
+      formData.append('audioFile', audioInput.files[0]); // 키 이름 주의
+      
+      if (imageInput.files.length > 0) {
+        formData.append('imageFile', imageInput.files[0]); // 키 이름 주의
+      }
+
       try {
-        const res = await fetch('http://localhost:3000/api/upload', { method: 'POST', body: formData });
+        const res = await fetch('http://localhost:3000/api/upload', { 
+          method: 'POST', 
+          body: formData 
+        });
+        const result = await res.json();
+
         if (res.ok) {
-          document.getElementById('upload-status').textContent = '✅ 업로드 성공!';
+          statusDiv.textContent = '✅ 업로드 성공!';
+          statusDiv.style.color = '#4caf50';
+          e.target.reset();
         } else {
-          document.getElementById('upload-status').textContent = '❌ 업로드 실패.';
+          statusDiv.textContent = '❌ ' + (result.message || '실패');
+          statusDiv.style.color = '#ff6666';
         }
       } catch (err) {
-        document.getElementById('upload-status').textContent = '서버 오류 발생.';
+        statusDiv.textContent = '❌ 서버 오류 발생';
+        statusDiv.style.color = '#ff6666';
       }
     };
   </script>

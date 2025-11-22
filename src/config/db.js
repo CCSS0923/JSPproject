@@ -1,4 +1,4 @@
-// src/config/db.js (수정됨)
+// src/config/db.js
 
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
@@ -12,14 +12,27 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
+// Users 테이블 생성
 db.run(
   `CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE,
     username TEXT UNIQUE,
-    nickname TEXT UNIQUE, -- 여기에 UNIQUE 추가
+    nickname TEXT UNIQUE,
     password TEXT,
     profile_image TEXT DEFAULT '../assets/default_profile.jpg'
+  )`
+);
+
+// [추가됨] Tracks 테이블 생성
+db.run(
+  `CREATE TABLE IF NOT EXISTS tracks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    artist TEXT NOT NULL,
+    filename TEXT NOT NULL,
+    album_cover TEXT DEFAULT '../assets/albumart.jpg',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`
 );
 
