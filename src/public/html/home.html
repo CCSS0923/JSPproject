@@ -2,291 +2,172 @@
 <html lang="ko">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>SoundClone Home</title>
-  <link rel="stylesheet" href="../css/index.css" />
-  <link rel="stylesheet" href="../css/home.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body,
-    html {
-      margin: 0;
-      background: #000;
-      color: #ddd;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .navbar {
-      background: #111;
-    }
-
-    .menu li a {
-      color: #eee;
-    }
-
-    .menu li a:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .search-container input {
-      background: #222;
-      color: #eee;
-    }
-
-    .user-buttons button {
-      border-color: #fff;
-      color: #fff;
-    }
-
-    .user-buttons button:hover {
-      background: #fff;
-      color: #111;
-    }
-
-    .main-content {
-      max-width: 1200px;
-      margin: 30px auto 80px;
-      padding: 0 24px;
-    }
-
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin: 30px 0 14px;
-      color: #fff;
-    }
-
-    .card-row {
-      display: flex;
-      gap: 18px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-    }
-
-    .card {
-      flex-shrink: 0;
-      width: 180px;
-      text-decoration: none;
-      color: #fff;
-      font-size: 13px;
-    }
-
-    .card-cover {
-      width: 180px;
-      height: 180px;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #222;
-      margin-bottom: 8px;
-      position: relative;
-      box-shadow: 0 0 9px rgba(0, 0, 0, 0.5);
-    }
-
-    .card-cover img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .card-artist {
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 3px;
-    }
-
-    .home-section {
-      margin-bottom: 40px;
-    }
-
-    .player-bar {
-      background: #111;
-      border-top: 1px solid #333;
-    }
-
-    #footer-current-time,
-    #footer-duration-time {
-      color: #ddd;
-    }
-
-    .volume-icon {
-      color: #fff;
-    }
-
-    @media (max-width: 900px) {
-      .main-content {
-        padding: 0 12px 80px;
-      }
-    }
-  </style>
+	<meta charset="UTF-8" />
+	<title>SoundClone Home</title>
+	<link rel="stylesheet" href="../css/index.css" />
+	<link rel="stylesheet" href="../css/home.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
 <body>
-  <header class="navbar">
-    <div class="logo">🎵 SoundClone</div>
-    <nav>
-      <ul class="menu">
-        <li><a href="home.html">Home</a></li>
-        <li><a href="library.html">Library</a></li>
-      </ul>
-    </nav>
-    <div class="search-container">
-      <input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
-      <button class="search-btn">🔍</button>
-    </div>
-    <div class="user-buttons" id="authArea">
-      <button class="upload-btn" onclick="location.href='upload.html'">Upload</button>
-      <button class="more-btn">•••</button>
-      <button class="sign-in-btn" onclick="location.href='login.html?returnTo=home.html'">Sign in</button>
-      <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
-    </div>
-  </header>
+	<header class="navbar">
+		<div class="logo">🎵 SoundClone</div>
+		<nav>
+			<ul class="menu">
+				<li><a href="home.html">Home</a></li>
+				<li><a href="library.html">Library</a></li>
+			</ul>
+		</nav>
+		<div class="search-container">
+			<input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
+			<button class="search-btn">🔍</button>
+		</div>
+		<div class="user-buttons" id="authArea">
+			<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>
+			<button class="more-btn">•••</button>
+			<button class="sign-in-btn" onclick="location.href='login.html?returnTo=home.html'">Sign in</button>
+			<button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
+		</div>
+	</header>
 
-  <main class="main-content">
-    <section class="home-section">
-      <h2 class="section-title">More of what you like</h2>
-      <div class="card-row">
-        <a href="index.html" class="card">
-          <div class="card-cover">
-            <img src="../assets/albumart.jpg" alt="Darling Dance" />
-          </div>
-          <div class="card-title">Darling Dance</div>
-          <div class="card-artist">Kairikibear</div>
-        </a>
+	<main class="main-content">
+		<section class="home-section">
+			<h2 class="section-title">More of what you like</h2>
+			<div class="card-row">
+				<a href="index.html" class="card">
+					<div class="card-cover">
+						<img src="../assets/albumart.jpg" alt="Darling Dance" />
+					</div>
+					<div class="card-title">Darling Dance</div>
+					<div class="card-artist">Kairikibear</div>
+				</a>
 
-        <a href="index.html" class="card">
-          <div class="card-cover">
-            <img src="../assets/sample2_album.jpg" alt="두번째 곡 예시" />
-          </div>
-          <div class="card-title">두번째 곡 예시</div>
-          <div class="card-artist">artist 2</div>
-        </a>
+				<a href="index.html" class="card">
+					<div class="card-cover">
+						<img src="../assets/sample2_album.jpg" alt="두번째 곡 예시" />
+					</div>
+					<div class="card-title">두번째 곡 예시</div>
+					<div class="card-artist">artist 2</div>
+				</a>
 
-        <a href="index.html" class="card">
-          <div class="card-cover">
-            <img src="../assets/albumart.jpg" alt="Another" />
-          </div>
-          <div class="card-title">Another Track</div>
-          <div class="card-artist">Artist</div>
-        </a>
-      </div>
-    </section>
+				<a href="index.html" class="card">
+					<div class="card-cover">
+						<img src="../assets/albumart.jpg" alt="Another" />
+					</div>
+					<div class="card-title">Another Track</div>
+					<div class="card-artist">Artist</div>
+				</a>
+			</div>
+		</section>
 
-    <section class="home-section">
-      <h2 class="section-title">Recently Played</h2>
-      <div class="card-row">
-        <a href="index.html" class="card">
-          <div class="card-cover">
-            <img src="../assets/albumart.jpg" alt="Darling Dance" />
-          </div>
-          <div class="card-title">Darling Dance</div>
-          <div class="card-artist">Kairikibear</div>
-        </a>
-        <a href="index.html" class="card">
-          <div class="card-cover">
-            <img src="../assets/sample2_album.jpg" alt="Sample2" />
-          </div>
-          <div class="card-title">두번째 곡 예시</div>
-          <div class="card-artist">artist 2</div>
-        </a>
-      </div>
-    </section>
+		<section class="home-section">
+			<h2 class="section-title">Recently Played</h2>
+			<div class="card-row">
+				<a href="index.html" class="card">
+					<div class="card-cover">
+						<img src="../assets/albumart.jpg" alt="Darling Dance" />
+					</div>
+					<div class="card-title">Darling Dance</div>
+					<div class="card-artist">Kairikibear</div>
+				</a>
+				<a href="index.html" class="card">
+					<div class="card-cover">
+						<img src="../assets/sample2_album.jpg" alt="Sample2" />
+					</div>
+					<div class="card-title">두번째 곡 예시</div>
+					<div class="card-artist">artist 2</div>
+				</a>
+			</div>
+		</section>
 
-    <section class="home-section">
-      <h2 class="section-title">Liked by You</h2>
-      <div class="card-row">
-        <a href="index.html" class="card">
-          <div class="card-cover">
-            <img src="../assets/albumart.jpg" alt="Liked" />
-          </div>
-          <div class="card-title">Your Favorite Track</div>
-          <div class="card-artist">Artist Example</div>
-        </a>
-      </div>
-    </section>
+		<section class="home-section">
+			<h2 class="section-title">Liked by You</h2>
+			<div class="card-row">
+				<a href="index.html" class="card">
+					<div class="card-cover">
+						<img src="../assets/albumart.jpg" alt="Liked" />
+					</div>
+					<div class="card-title">Your Favorite Track</div>
+					<div class="card-artist">Artist Example</div>
+				</a>
+			</div>
+		</section>
 
-    <section class="home-section">
-      <h2 class="section-title">Your Playlists</h2>
-      <div class="card-row">
-        <a class="card">
-          <div class="card-cover" style="background:#444;display:flex;align-items:center;justify-content:center;">
-            🎧
-          </div>
-          <div class="card-title">My Playlist</div>
-          <div class="card-artist">3 tracks</div>
-        </a>
-      </div>
-    </section>
+		<section class="home-section">
+			<h2 class="section-title">Your Playlists</h2>
+			<div class="card-row">
+				<a class="card">
+					<div class="card-cover" style="background:#444;display:flex;align-items:center;justify-content:center;">
+						🎧
+					</div>
+					<div class="card-title">My Playlist</div>
+					<div class="card-artist">3 tracks</div>
+				</a>
+			</div>
+		</section>
 
-    <section class="home-section">
-      <h2 class="section-title">Popular Artists</h2>
-      <div class="card-row">
-        <a class="card">
-          <div class="card-cover">
-            <img src="../assets/artist.jpg" alt="Artist" />
-          </div>
-          <div class="card-title">Kairikibear</div>
-          <div class="card-artist">Popular artist</div>
-        </a>
-      </div>
-    </section>
-  </main>
+		<section class="home-section">
+			<h2 class="section-title">Popular Artists</h2>
+			<div class="card-row">
+				<a class="card">
+					<div class="card-cover">
+						<img src="../assets/artist.jpg" alt="Artist" />
+					</div>
+					<div class="card-title">Kairikibear</div>
+					<div class="card-artist">Popular artist</div>
+				</a>
+			</div>
+		</section>
+	</main>
 
-  <footer class="player-bar">
-    <div class="player-bar-section">
-      <button id="footer-play-pause-btn" class="bar-btn" aria-label="Play/Pause">
-        <span class="icon play">▶</span>
-        <span class="icon pause">⏸</span>
-      </button>
-      <span id="footer-current-time">0:00</span>
-      <input type="range" id="progress-bar" min="0" max="100" value="0" />
-      <span id="footer-duration-time">0:00</span>
-      <input type="range" id="volume-slider" min="0" max="100" value="80" />
-      <span class="volume-icon">🔊</span>
-    </div>
-  </footer>
+	<footer class="player-bar">
+		<div class="player-bar-section">
+			<button id="footer-play-pause-btn" class="bar-btn" aria-label="Play/Pause">
+				<span class="icon play">▶</span>
+				<span class="icon pause">⏸</span>
+			</button>
+			<span id="footer-current-time">0:00</span>
+			<input type="range" id="progress-bar" min="0" max="100" value="0" />
+			<span id="footer-duration-time">0:00</span>
+			<input type="range" id="volume-slider" min="0" max="100" value="80" />
+			<span class="volume-icon">🔊</span>
+		</div>
+	</footer>
 
-  <script>
-    function renderAuth() {
-      const p = JSON.parse(localStorage.getItem('profile'));
-      const area = document.getElementById('authArea');
+	<script>
+		function renderAuth() {
+			const p = JSON.parse(localStorage.getItem('profile'));
+			const area = document.getElementById('authArea');
 
-      const uploadBtnHtml = `<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>`;
-      const moreBtnHtml = `<button class="more-btn">•••</button>`;
+			const uploadBtnHtml = `<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>`;
+			const moreBtnHtml = `<button class="more-btn">•••</button>`;
 
-      if (p && area) {
-        area.innerHTML = `
-          ${uploadBtnHtml}
-          ${moreBtnHtml}
-          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <img src="${p.img}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee;border:1px solid #bbb;" alt="프로필" />
-            <span style="font-size:16px;color:#fff;font-weight:bold;">${p.name}</span>
-            <button onclick="logout()" style="margin-left:8px;padding:5px 16px;border-radius:5px;background:#444;color:#fff;border:none;cursor:pointer;">Logout</button>
-          </div>`;
-      } else if (area) {
-        area.innerHTML = `
-          ${uploadBtnHtml}
-          ${moreBtnHtml}
-          <button class="sign-in-btn" onclick="location.href='login.html?returnTo=home.html'">Sign in</button>
-          <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>`;
-      }
-    }
-    function logout() {
-      localStorage.removeItem('profile');
-      renderAuth();
-    }
-    renderAuth();
-  </script>
+			if (p && area) {
+				area.innerHTML = `
+					${uploadBtnHtml}
+					${moreBtnHtml}
+					<div style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+						<img src="${p.img}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee;border:1px solid #bbb;" alt="프로필" />
+						<span style="font-size:16px;color:#fff;font-weight:bold;">${p.name}</span>
+						<button onclick="logout()" style="margin-left:8px;padding:5px 16px;border-radius:5px;background:#444;color:#fff;border:none;cursor:pointer;">Logout</button>
+					</div>`;
+			} else if (area) {
+				area.innerHTML = `
+					${uploadBtnHtml}
+					${moreBtnHtml}
+					<button class="sign-in-btn" onclick="location.href='login.html?returnTo=home.html'">Sign in</button>
+					<button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>`;
+			}
+		}
+		function logout() {
+			localStorage.removeItem('profile');
+			renderAuth();
+		}
+		renderAuth();
+	</script>
 
-  <script src="../js/globalPlayer.js"></script>
-  <script src="../js/player.js"></script>
+	<script src="../js/globalPlayer.js"></script>
+	<script src="../js/player.js"></script>
 </body>
 
 </html>

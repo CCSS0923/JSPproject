@@ -1,0 +1,178 @@
+/* src/public/css/track.css */
+
+body,
+html {
+  background: #000;
+  color: #ddd;
+}
+
+.navbar {
+  background: #111;
+}
+
+.menu li a {
+  color: #eee;
+}
+
+.menu li a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.search-container input {
+  background: #222;
+  color: #eee;
+}
+
+.user-buttons button {
+  border-color: #fff;
+  color: #fff;
+}
+
+.user-buttons button:hover {
+  background: #fff;
+  color: #111;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 30px auto 80px;
+  padding: 0 24px;
+}
+
+.track-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(260px, 1fr);
+  gap: 24px;
+}
+
+.track-main {
+  min-width: 0;
+}
+
+.player-section {
+  background: linear-gradient(120deg, #333, #151515);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.tracklist-section {
+  margin-top: 20px;
+}
+
+#tracklist {
+  background: #111;
+  color: #eee;
+}
+
+.track-item {
+  background: transparent;
+  border-bottom: 1px solid #222;
+}
+
+.track-item:hover {
+  background: #181818;
+}
+
+.track-item.active {
+  background: #ff5500;
+  color: #fff;
+}
+
+.track-sidebar {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-card {
+  background: #111;
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: #ddd;
+  font-size: 14px;
+}
+
+.sidebar-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.sidebar-track {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.sidebar-track img {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.sidebar-track-info {
+  font-size: 13px;
+}
+
+.sidebar-track-info .name {
+  color: #fff;
+  font-weight: 600;
+}
+
+.sidebar-track-info .artist {
+  color: #aaa;
+  margin-top: 2px;
+}
+
+.sidebar-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #222;
+  font-size: 12px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.sidebar-meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-top: 6px;
+  color: #aaa;
+}
+
+.sidebar-meta-row span strong {
+  color: #fff;
+}
+
+#time-display {
+  color: #fff;
+}
+
+#footer-current-time,
+#footer-duration-time {
+  color: #ddd;
+}
+
+.volume-icon {
+  color: #fff;
+}
+
+.player-bar {
+  background: #111;
+  border-top: 1px solid #333;
+}
+
+@media (max-width: 900px) {
+  .track-layout {
+    grid-template-columns: 1fr;
+  }
+}

@@ -163,3 +163,124 @@ body {
     padding-right: 0;
   }
 }
+
+/* 기존 home.css 내용 아래에 이어서 붙여넣기 */
+
+/* --- home.html 내부 style 태그에서 이동된 내용 --- */
+
+body,
+html {
+  background: #000;
+  color: #ddd;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+  background: #111;
+}
+
+.menu li a {
+  color: #eee;
+}
+
+.menu li a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.search-container input {
+  background: #222;
+  color: #eee;
+}
+
+.user-buttons button {
+  border-color: #fff;
+  color: #fff;
+}
+
+.user-buttons button:hover {
+  background: #fff;
+  color: #111;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 30px auto 80px;
+  padding: 0 24px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 30px 0 14px;
+  color: #fff;
+}
+
+.card-row {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.card {
+  flex-shrink: 0;
+  width: 180px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 13px;
+}
+
+.card-cover {
+  width: 180px;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #222;
+  margin-bottom: 8px;
+  position: relative;
+  box-shadow: 0 0 9px rgba(0, 0, 0, 0.5);
+}
+
+.card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-artist {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 3px;
+}
+
+.home-section {
+  margin-bottom: 40px;
+}
+
+.player-bar {
+  background: #111;
+  border-top: 1px solid #333;
+}
+
+#footer-current-time,
+#footer-duration-time {
+  color: #ddd;
+}
+
+.volume-icon {
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    padding: 0 12px 80px;
+  }
+}
