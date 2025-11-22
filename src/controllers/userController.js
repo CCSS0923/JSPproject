@@ -1,41 +1,28 @@
-// src/controllers/userController.js (수정됨)
-
 const bcrypt = require('bcrypt');
 const userModel = require('../models/userModel');
 
-// 회원가입 로직 수정
 exports.signup = (req, res) => {
   const { email, username, nickname, password } = req.body;
   if (!email || !username || !nickname || !password)
     return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
 
-  // 1. userModel.findDuplicates 함수 호출
   userModel.findDuplicates(email, username, nickname, (err, user) => {
     if (err) return res.status(500).json({ message: 'DB 조회 중 오류 발생: ' + err.message });
 
-    // 2. 중복 검사 로직
     if (user) {
-      if (user.email === email) {
-        return res.status(409).json({ message: '이미 사용 중인 이메일입니다.' });
-      }
-      if (user.username === username) {
-        return res.status(409).json({ message: '이미 사용 중인 아이디입니다.' });
-      }
-      if (user.nickname === nickname) {
-        return res.status(409).json({ message: '이미 사용 중인 닉네임입니다.' });
-      }
+      if (user.email === email) return res.status(409).json({ message: '이미 사용 중인 이메일입니다.' });
+      if (user.username === username) return res.status(409).json({ message: '이미 사용 중인 아이디입니다.' });
+      if (user.nickname === nickname) return res.status(409).json({ message: '이미 사용 중인 닉네임입니다.' });
     }
 
-    // 3. 중복이 없으면 사용자 생성
     const hash = bcrypt.hashSync(password, 10);
     userModel.createUser(email, username, nickname, hash, (err2) => {
-      if (err2) return res.status(500).json({ message: '회원가입에 실패했습니다: ' + err2.message });
+      if (err2) return res.status(500).json({ message: '회원가입 실패: ' + err2.message });
       res.status(201).json({ message: '회원가입 성공' });
     });
   });
 };
 
-// (login 함수는 이전과 동일)
 exports.login = (req, res) => {
   const { loginId, password } = req.body;
   if (!loginId || !password)
@@ -51,10 +38,28 @@ exports.login = (req, res) => {
     res.status(200).json({ 
       message: '로그인 성공', 
       user: {
+        id: user.id, // [중요] DB 연동을 위해 ID 포함
         username: user.username,
         nickname: user.nickname,
         profile_image: user.profile_image
       } 
     });
+  });
+};
+
+exports.deleteUser = (req, res) => {
+  const userId = req.params.id;
+
+  // 유효성 검사 (선택 사항: 본인 확인 로직 등이 들어갈 수 있음)
+  if (!userId) {
+    return res.status(400).json({ message: 'User ID is required' });
+  }
+
+  userModel.deleteUser(userId, (err) => {
+    if (err) {
+      console.error('Delete user failed:', err);
+      return res.status(500).json({ message: '계정 삭제 중 오류가 발생했습니다.' });
+    }
+    res.status(200).json({ message: '계정이 성공적으로 삭제되었습니다.' });
   });
 };

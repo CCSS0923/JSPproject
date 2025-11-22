@@ -44,23 +44,21 @@
         const result = await response.json();
         
         if (response.ok) {
-          // --- 이 부분이 핵심입니다 ---
-          // 1. home.html이 사용할 객체를 만듭니다.
+          // --- 수정된 부분 ---
+          // user.id를 함께 저장해야 히스토리 기능이 작동합니다.
           const profileData = {
-            name: result.user.nickname,      // 닉네임을 'name' 키에
-            img: result.user.profile_image   // 이미지 경로를 'img' 키에
+            id: result.user.id,              // [추가] DB PK
+            name: result.user.nickname,
+            img: result.user.profile_image
           };
           
-          // 2. 'profile'이라는 키로 localStorage에 저장합니다.
           localStorage.setItem('profile', JSON.stringify(profileData)); 
           
-          // 3. URL 파라미터에서 돌아갈 경로(returnTo)를 찾습니다.
           const urlParams = new URLSearchParams(window.location.search);
           const returnTo = urlParams.get('returnTo');
 
-          // 4. returnTo 값이 있으면 거기로, 없으면 기본값(home.html)으로 이동합니다.
           location.href = returnTo || "home.html";
-          // --------------------------
+          // ------------------
 
         } else {
           errorBox.textContent = result.message || "로그인 실패";

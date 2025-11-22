@@ -24,28 +24,31 @@
 		</div>
 
 		<div class="user-buttons" id="authArea">
-			<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>
-			<button class="more-btn">•••</button>
-			<button class="sign-in-btn" onclick="location.href='login.html?returnTo=index.html'">Sign in</button>
-			<button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
-		</div>
+			</div>
 	</header>
 
 	<main class="main-content">
 		<div class="track-layout">
-			<!-- 메인 플레이어 + 트랙리스트 -->
 			<div class="track-main">
 				<section class="player-section">
 					<div class="player-info">
 						<div id="current-track-info">
-							<div class="user-name" id="artist-name">Kairikibear</div>
-							<div class="track-title" id="track-title">Kairikibear - Darling Dance</div>
+							<div class="user-name" id="artist-name">Artist</div>
+							<div class="track-title" id="track-title">Track Title</div>
 						</div>
 						<div class="waveform-container">
-							<button id="play-pause-btn" aria-label="Play/Pause">
-								<span class="icon play">▶</span>
-								<span class="icon pause">⏸</span>
-							</button>
+							<div class="player-btn-group">
+								<button id="like-btn" aria-label="Like">
+									<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+										<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+									</svg>
+								</button>
+								<button id="play-pause-btn" aria-label="Play/Pause">
+									<span class="icon play">▶</span>
+									<span class="icon pause">⏸</span>
+								</button>
+							</div>
+
 							<canvas id="waveform"></canvas>
 							<div id="time-display">
 								<span id="current-time">0:00</span> /
@@ -64,38 +67,12 @@
 				</section>
 			</div>
 
-			<!-- 오른쪽 사이드바 -->
 			<aside class="track-sidebar">
 				<div class="sidebar-card">
 					<div class="sidebar-title">Track info</div>
-					<div>Lilium Records · Single</div>
+					<div>SoundClone Exclusive</div>
 					<div class="sidebar-meta-row">
-						<span><strong>3:27</strong> length</span>
 						<span><strong>Audio</strong></span>
-					</div>
-					<div class="sidebar-meta-row">
-						<span>Plays: <strong>—</strong></span>
-						<span>Likes: <strong>—</strong></span>
-					</div>
-				</div>
-
-				<div class="sidebar-card">
-					<div class="sidebar-title">Related tracks</div>
-					<div class="sidebar-track">
-						<img src="../assets/sample2_album.jpg" alt="related" />
-						<div class="sidebar-track-info">
-							<div class="name">두번째 곡 예시</div>
-							<div class="artist">artist 2</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="sidebar-card">
-					<div class="sidebar-title">Tags</div>
-					<div>
-						<span class="sidebar-tag">electronic</span>
-						<span class="sidebar-tag">vocaloid</span>
-						<span class="sidebar-tag">j-pop</span>
 					</div>
 				</div>
 			</aside>
@@ -116,42 +93,8 @@
 		</div>
 	</footer>
 
-<script src="../js/router.js"></script>
-
-	<script>
-		function renderAuth() {
-			const p = JSON.parse(localStorage.getItem('profile'));
-			const area = document.getElementById('authArea');
-
-			const uploadBtnHtml = `<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>`;
-			const moreBtnHtml = `<button class="more-btn">•••</button>`;
-
-			if (p && area) {
-				area.innerHTML = `
-					${uploadBtnHtml}
-					${moreBtnHtml}
-					<div style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-						<img src="${p.img}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee;border:1px solid #bbb;" alt="프로필" />
-						<span style="font-size:16px;color:#fff;font-weight:bold;">${p.name}</span>
-						<button onclick="logout()" style="margin-left:8px;padding:5px 16px;border-radius:5px;background:#444;color:#fff;border:none;cursor:pointer;">Logout</button>
-					</div>`;
-			} else if (area) {
-				area.innerHTML = `
-					${uploadBtnHtml}
-					${moreBtnHtml}
-					<button class="sign-in-btn" onclick="location.href='login.html?returnTo=index.html'">Sign in</button>
-					<button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>`;
-			}
-		}
-		function logout() {
-			localStorage.removeItem('profile');
-			renderAuth();
-		}
-		renderAuth();
-	</script>
-
+	<script src="../js/router.js"></script>
 	<script src="../js/globalPlayer.js"></script>
 	<script src="../js/player.js"></script>
 </body>
-
 </html>

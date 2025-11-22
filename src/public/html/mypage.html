@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지 - SoundClone</title>
+  <link rel="stylesheet" href="../css/index.css">
+  <link rel="stylesheet" href="../css/login.css">
+  <style>
+    /* 마이페이지 전용 스타일 */
+    .mypage-container {
+      max-width: 500px;
+      margin: 80px auto;
+      background: #232323; /* 어두운 카드 배경 */
+      padding: 40px;
+      border-radius: 8px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    
+    .profile-img-large {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #ff5500; /* 브랜드 컬러 */
+      margin-bottom: 20px;
+      background: #eee;
+    }
+
+    .user-info-box {
+      background: #333;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: left;
+      margin-bottom: 30px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 16px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 10px;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .label {
+      color: #aaa;
+      font-weight: bold;
+    }
+
+    /* 버튼 스타일 오버라이딩 */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .btn-back {
+      background-color: #555;
+    }
+    .btn-back:hover {
+      background-color: #444;
+    }
+
+    .btn-delete {
+      background-color: #d32f2f; /* 빨간색 경고 */
+    }
+    .btn-delete:hover {
+      background-color: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo" onclick="location.href='home.html'" style="cursor:pointer;">🎵 SoundClone</div>
+    <nav>
+      <ul class="menu">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="library.html">Library</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="mypage-container">
+    <h2>My Page</h2>
+
+    <div id="profile-area">
+      <p>정보를 불러오는 중...</p>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-back" onclick="location.href='home.html'">홈으로 돌아가기</button>
+      <button class="btn-delete" onclick="deleteMyAccount()">회원 탈퇴</button>
+    </div>
+  </div>
+
+  <script>
+    // 1. 로그인 상태 체크 (비로그인 접근 차단)
+    const profileRaw = localStorage.getItem('profile');
+    
+    if (!profileRaw) {
+      alert('로그인이 필요한 서비스입니다.');
+      // 히스토리를 남기지 않고 로그인 페이지로 이동
+      location.replace('login.html'); 
+    }
+
+    const profile = JSON.parse(profileRaw);
+
+    // 2. 프로필 정보 렌더링
+    const profileArea = document.getElementById('profile-area');
+    profileArea.innerHTML = `
+      <img src="${profile.img || '../assets/default_profile.jpg'}" 
+           class="profile-img-large" 
+           onerror="this.src='../assets/default_profile.jpg'" 
+           alt="프로필 이미지" />
+      
+      <div class="user-info-box">
+        <div class="info-row">
+          <span class="label">닉네임</span>
+          <span>${profile.name}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">회원 번호</span>
+          <span>#${profile.id}</span>
+        </div>
+      </div>
+    `;
+
+    // 3. 회원 탈퇴 함수 (요청하신 로직)
+    async function deleteMyAccount() {
+      // 방어 코드: 정보가 없으면 재로그인 유도
+      if (!profile || !profile.id) {
+        alert('사용자 정보가 올바르지 않습니다. 다시 로그인해주세요.');
+        location.href = 'login.html';
+        return;
+      }
+
+      if (!confirm('정말로 탈퇴하시겠습니까?\n업로드한 음악과 모든 활동 기록이 영구적으로 삭제됩니다.')) return;
+
+      try {
+        // 서버 API 호출
+        const res = await fetch(`http://localhost:3000/api/users/${profile.id}`, {
+          method: 'DELETE'
+        });
+
+        if (res.ok) {
+          alert('정상적으로 탈퇴되었습니다. 이용해 주셔서 감사합니다.');
+          
+          // 로컬 스토리지 정보 전체 삭제
+          localStorage.clear(); 
+          
+          // 로그인 페이지로 이동
+          location.href = 'login.html'; 
+        } else {
+          const data = await res.json();
+          alert('삭제 실패: ' + (data.message || '알 수 없는 오류'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('서버와 통신 중 오류가 발생했습니다.');
+      }
+    }
+  </script>
+</body>
+</html>

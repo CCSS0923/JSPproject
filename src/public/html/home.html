@@ -23,11 +23,7 @@
 			<button class="search-btn">🔍</button>
 		</div>
 		<div class="user-buttons" id="authArea">
-			<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>
-			<button class="more-btn">•••</button>
-			<button class="sign-in-btn" onclick="location.href='login.html?returnTo=home.html'">Sign in</button>
-			<button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
-		</div>
+			</div>
 	</header>
 
 	<main class="main-content">
@@ -48,13 +44,15 @@
 		<section class="home-section">
 			<h2 class="section-title">Liked by You</h2>
 			<div class="card-row" id="liked-container">
-				</div>
+				<div style="padding: 20px; color: #888;">Loading...</div>
+			</div>
 		</section>
 
 		<section class="home-section">
 			<h2 class="section-title">Your Playlists</h2>
 			<div class="card-row" id="playlist-container">
-				</div>
+				<div style="padding: 20px; color: #888;">Loading...</div>
+			</div>
 		</section>
 
 		<section class="home-section">
@@ -86,175 +84,7 @@
 	</footer>
 
 	<script src="../js/router.js"></script>
-
-	<script>
-		// ---------------------------------------------------------
-		// A. 인증(로그인/로그아웃) 처리
-		// ---------------------------------------------------------
-		function renderAuth() {
-			const p = JSON.parse(localStorage.getItem('profile'));
-			const area = document.getElementById('authArea');
-
-			const uploadBtnHtml = `<button class="upload-btn" onclick="location.href='upload.html'">Upload</button>`;
-			const moreBtnHtml = `<button class="more-btn">•••</button>`;
-
-			if (p && area) {
-				area.innerHTML = `
-					${uploadBtnHtml}
-					${moreBtnHtml}
-					<div style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-						<img src="${p.img}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee;border:1px solid #bbb;" alt="프로필" />
-						<span style="font-size:16px;color:#fff;font-weight:bold;">${p.name}</span>
-						<button onclick="logout()" style="margin-left:8px;padding:5px 16px;border-radius:5px;background:#444;color:#fff;border:none;cursor:pointer;">Logout</button>
-					</div>`;
-			} else if (area) {
-				area.innerHTML = `
-					${uploadBtnHtml}
-					${moreBtnHtml}
-					<button class="sign-in-btn" onclick="location.href='login.html?returnTo=home.html'">Sign in</button>
-					<button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>`;
-			}
-		}
-
-		function logout() {
-			localStorage.removeItem('profile');
-			renderAuth();
-		}
-		
-		// 페이지 로드 시 인증 체크
-		renderAuth();
-
-
-		// ---------------------------------------------------------
-		// B. 홈 화면 트랙 렌더링 메인 함수 (globalPlayer.js에서 호출)
-		// ---------------------------------------------------------
-		window.renderHomeTracks = function(tracks) {
-			// 1. New Uploads: 전체 목록, 삭제 버튼 포함
-			renderSection('new-uploads-container', tracks, true);
-
-			// 2. Recently Played: 앞에서 3개만 표시 (시뮬레이션)
-			renderSection('recent-container', tracks.slice(0, 3), false);
-
-			// 3. Liked by You: 뒤에서 3개만 표시 (시뮬레이션)
-			renderSection('liked-container', [...tracks].reverse().slice(0, 3), false);
-
-			// 4. Playlist: 트랙 개수를 보여주는 더미 카드 생성
-			const playlistContainer = document.getElementById('playlist-container');
-			if(playlistContainer) {
-				playlistContainer.innerHTML = `
-				<a class="card" href="javascript:void(0)">
-					<div class="card-cover" style="background:#444;display:flex;align-items:center;justify-content:center;font-size:40px;">🎧</div>
-					<div class="card-title">My Awesome Mix</div>
-					<div class="card-artist">${tracks.length} tracks</div>
-				</a>`;
-			}
-		}
-
-		// ---------------------------------------------------------
-		// C. 섹션별 렌더링 헬퍼 함수
-		// ---------------------------------------------------------
-		function renderSection(containerId, trackList, showDeleteBtn) {
-			const container = document.getElementById(containerId);
-			if (!container) return;
-
-			container.innerHTML = ''; 
-
-			if (!trackList || trackList.length === 0) {
-				container.innerHTML = '<div style="padding:10px; color:#aaa;">표시할 곡이 없습니다.</div>';
-				return;
-			}
-
-			trackList.forEach((track) => {
-				// 전역 트랙 리스트에서의 실제 인덱스를 찾음 (재생 연동을 위해 필수)
-				const originalIndex = window.GlobalTracks.findIndex(t => t.id === track.id);
-
-				const wrapper = document.createElement('div');
-				wrapper.style.position = 'relative';
-				wrapper.style.display = 'inline-block';
-
-				// 삭제 버튼 생성 (옵션)
-				if (showDeleteBtn) {
-					const delBtn = document.createElement('button');
-					delBtn.innerHTML = '✕';
-					delBtn.style.position = 'absolute';
-					delBtn.style.top = '5px';
-					delBtn.style.right = '5px';
-					delBtn.style.background = 'rgba(0,0,0,0.7)';
-					delBtn.style.color = 'white';
-					delBtn.style.border = 'none';
-					delBtn.style.borderRadius = '50%';
-					delBtn.style.width = '24px';
-					delBtn.style.height = '24px';
-					delBtn.style.cursor = 'pointer';
-					delBtn.style.zIndex = '10';
-					delBtn.title = "삭제하기";
-					
-					delBtn.onclick = (e) => {
-						e.stopPropagation();
-						deleteTrack(track.id);
-					};
-					wrapper.appendChild(delBtn);
-				}
-
-				// 카드 생성
-				const card = document.createElement('a');
-				card.className = 'card';
-				// router.js가 감지할 수 있도록 href 설정
-				card.href = 'index.html'; 
-				
-				card.onclick = (e) => {
-					e.preventDefault(); // 기본 이동 막음
-					
-					if (window.globalPlayer) {
-						// 같은 곡이면 재생 상태 유지한 채 이동 (이어듣기)
-						// 다른 곡이면 변경 후 재생 (처음부터)
-						if (window.globalPlayer.currentTrackIndex !== originalIndex) {
-							window.globalPlayer.setTrack(originalIndex);
-						}
-						// SPA 라우터로 페이지 이동 요청
-						navigate('index.html');
-					}
-				};
-
-				card.innerHTML = `
-					<div class="card-cover">
-						<img src="${track.albumCover}" alt="${track.title}" onerror="this.src='../assets/albumart.jpg'" />
-					</div>
-					<div class="card-title">${track.title}</div>
-					<div class="card-artist">${track.artist}</div>
-				`;
-				
-				wrapper.appendChild(card);
-				container.appendChild(wrapper);
-			});
-		}
-
-		// ---------------------------------------------------------
-		// D. 트랙 삭제 함수 (API)
-		// ---------------------------------------------------------
-		async function deleteTrack(id) {
-			if(!confirm('정말로 이 곡을 삭제하시겠습니까? (파일도 함께 삭제됩니다)')) return;
-
-			try {
-				const res = await fetch(`http://localhost:3000/api/tracks/${id}`, {
-					method: 'DELETE'
-				});
-				if(res.ok) {
-					alert('삭제되었습니다.');
-					// 리스트 갱신을 위해 새로고침 (라우터 환경에서는 fetchTracks 재호출이 더 좋지만 간단히 처리)
-					location.reload(); 
-				} else {
-					alert('삭제 실패: 서버 오류');
-				}
-			} catch(e) {
-				console.error(e);
-				alert('서버와 통신 중 오류가 발생했습니다.');
-			}
-		}
-	</script>
-
 	<script src="../js/globalPlayer.js"></script>
 	<script src="../js/player.js"></script>
 </body>
-
 </html>

@@ -19,3 +19,8 @@ exports.createUser = (email, username, nickname, passwordHash, callback) => {
   const sql = `INSERT INTO users (email, username, nickname, password) VALUES (?, ?, ?, ?)`;
   db.run(sql, [email, username, nickname, passwordHash], callback);
 };
+
+exports.deleteUser = (id, callback) => {
+  const sql = `DELETE FROM users WHERE id = ?`;
+  db.run(sql, [id], callback);
+};

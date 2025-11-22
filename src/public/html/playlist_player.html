@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>SoundClone Playlist Player</title>
+	<link rel="stylesheet" href="../css/index.css" />
+	<link rel="stylesheet" href="../css/track.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+	<header class="navbar">
+		<div class="logo">🎵 SoundClone</div>
+		<nav>
+			<ul class="menu">
+				<li><a href="home.html">Home</a></li>
+				<li><a href="library.html">Library</a></li>
+			</ul>
+		</nav>
+		<div class="search-container">
+			<input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
+			<button class="search-btn">🔍</button>
+		</div>
+
+		<div class="user-buttons" id="authArea">
+			</div>
+	</header>
+
+	<main class="main-content">
+		<div class="track-layout">
+			<div class="track-main">
+				<section class="player-section">
+					<div class="player-info">
+						<div id="current-track-info">
+							<div class="user-name" id="artist-name">Artist</div>
+							<div class="track-title" id="track-title">Track Title</div>
+						</div>
+						<div class="waveform-container">
+							<div class="player-btn-group">
+								<button id="like-btn" aria-label="Like">
+									<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+										<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+									</svg>
+								</button>
+								<button id="play-pause-btn" aria-label="Play/Pause">
+									<span class="icon play">▶</span>
+									<span class="icon pause">⏸</span>
+								</button>
+							</div>
+
+							<canvas id="waveform"></canvas>
+							<div id="time-display">
+								<span id="current-time">0:00</span> /
+								<span id="duration-time">0:00</span>
+							</div>
+						</div>
+					</div>
+					<div class="album-cover-container">
+						<img id="album-cover" src="../assets/albumart.jpg" alt="앨범 커버" />
+					</div>
+				</section>
+
+				<section class="tracklist-section">
+					<h2>곡 목록 (플레이리스트 세션)</h2>
+					<div id="tracklist"></div> </section>
+			</div>
+
+			<aside class="track-sidebar">
+				<div class="sidebar-card">
+					<div class="sidebar-title">Track info</div>
+					<div>Playlist Session</div>
+					<div class="sidebar-meta-row">
+						<span><strong>Audio</strong></span>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</main>
+
+	<footer class="player-bar">
+		<div class="player-bar-section">
+			<button id="footer-play-pause-btn" class="bar-btn" aria-label="Play/Pause">
+				<span class="icon play">▶</span>
+				<span class="icon pause">⏸</span>
+			</button>
+			<span id="footer-current-time">0:00</span>
+			<input type="range" id="progress-bar" min="0" max="100" value="0" />
+			<span id="footer-duration-time">0:00</span>
+			<input type="range" id="volume-slider" min="0" max="100" value="80" />
+			<span class="volume-icon">🔊</span>
+		</div>
+	</footer>
+
+	<script src="../js/globalPlayer.js"></script>
+	<script src="../js/player.js"></script>
+</body>
+</html>

@@ -1,5 +1,4 @@
 // src/public/js/player.js
-// Waveform 롤백 (1200 샘플) 및 클릭 탐색 기능 복구 완료
 
 const GP = window.globalPlayer;
 
@@ -12,18 +11,16 @@ let tracklistContainer;
 let progressBar, volumeSlider;
 let footerCurrentTime, footerDurationTime;
 let volumeIcon;
+let likeBtn; 
 
 let isSeeking = false;
 
-// 1. 페이지 로드 및 라우터 이동 감지
 window.addEventListener("DOMContentLoaded", () => {
-    // 만약 현재 페이지가 index.html이라면 초기화 실행
     if (document.getElementById("waveform")) {
         initPlayerPage();
     }
 });
 
-// Router.js에서 페이지 교체 후 발생하는 이벤트
 window.addEventListener('tracksLoaded', () => {
     if (document.getElementById("waveform")) {
         initPlayerPage();
@@ -33,15 +30,10 @@ window.addEventListener('tracksLoaded', () => {
 function initPlayerPage() {
     if (!window.globalPlayer) return;
     
-    // 요소 찾기
     cacheElements();
-    
-    // 이벤트 연결 (중복 방지 처리 포함)
     bindEvents();
 
-    // 데이터가 있으면 UI 즉시 갱신
     if (window.GlobalTracks && window.GlobalTracks.length > 0) {
-        // 인덱스 안전 장치
         if(!window.GlobalTracks[GP.currentTrackIndex]) {
             GP.currentTrackIndex = 0;
         }
@@ -49,12 +41,10 @@ function initPlayerPage() {
         buildTracklist();
         syncUIFromPlayer();
         
-        // [핵심] 웨이브폼 그리기 (데이터가 있는 경우)
         if (canvas) {
             const currentSrc = window.GlobalTracks[GP.currentTrackIndex].audioSrc;
             loadWaveform(currentSrc);
             
-            // 리사이즈 이벤트 재등록 방지
             window.removeEventListener("resize", handleResize);
             window.addEventListener("resize", handleResize);
         }
@@ -66,9 +56,6 @@ function handleResize() {
     if (waveformData) drawBaseWaveform(waveformData);
 }
 
-// -----------------------
-// 요소 캐싱
-// -----------------------
 function cacheElements() {
   canvas = document.getElementById("waveform");
   if (canvas) {
@@ -91,19 +78,15 @@ function cacheElements() {
   footerCurrentTime = document.getElementById("footer-current-time");
   footerDurationTime = document.getElementById("footer-duration-time");
   volumeIcon = document.querySelector(".volume-icon");
+  likeBtn = document.getElementById("like-btn"); 
 
-  // 볼륨 슬라이더 초기화
   if (volumeSlider && GP && GP.audio) {
     volumeSlider.value = GP.audio.volume * 100;
     updateVolumeIcon();
   }
 }
 
-// -----------------------
-// 이벤트 바인딩
-// -----------------------
 function bindEvents() {
-    // 버튼 이벤트 (onclick으로 중복 바인딩 방지)
     if (playPauseBtn) playPauseBtn.onclick = () => { GP.togglePlay(); updatePlayIcons(); };
     if (footerPlayPauseBtn) footerPlayPauseBtn.onclick = () => { GP.togglePlay(); updatePlayIcons(); };
 
@@ -129,7 +112,6 @@ function bindEvents() {
         };
     }
 
-    // [복구됨] Waveform 클릭 시 탐색 기능
     if (canvas) {
         canvas.onclick = (event) => {
             if (!GP.audio.duration) return;
@@ -137,18 +119,16 @@ function bindEvents() {
             const clickX = event.clientX - rect.left;
             const clickRatio = clickX / rect.width;
             
-            // 오디오 시간 이동
             GP.audio.currentTime = clickRatio * GP.audio.duration;
-            
-            // UI 즉시 업데이트 (반응성 향상)
             updateTimeAndProgress();
         };
     }
+
+    if (likeBtn) {
+        likeBtn.onclick = toggleLike;
+    }
 }
 
-// -----------------------
-// UI 동기화
-// -----------------------
 function syncUIFromPlayer() {
     const tracks = window.GlobalTracks;
     if (!tracks || !tracks.length) return;
@@ -168,11 +148,10 @@ function syncUIFromPlayer() {
 
     updatePlayIcons();
     updateVolumeIcon();
+
+    checkLikeStatus(track.id);
 }
 
-// -----------------------
-// 시간 및 파형 업데이트 (매초 호출됨)
-// -----------------------
 function updateTimeAndProgress() {
     if (!GP.audio.duration) return;
     const cur = GP.audio.currentTime;
@@ -188,17 +167,61 @@ function updateTimeAndProgress() {
     if (footerCurrentTime) footerCurrentTime.textContent = formatTime(cur);
     if (footerDurationTime) footerDurationTime.textContent = formatTime(dur);
     
-    // 파형 위에 진행상황 덧그리기
     if (canvas && waveformData) {
-        drawBaseWaveform(waveformData); // 베이스 다시 그림 (초기화)
-        drawProgressWaveform(waveformData, cur / dur); // 진행된 부분 덧그림
+        drawBaseWaveform(waveformData);
+        drawProgressWaveform(waveformData, cur / dur);
     }
 }
-window.updatePlayerUI = updateTimeAndProgress; // globalPlayer에서 호출 가능하도록 전역 노출
+window.updatePlayerUI = updateTimeAndProgress;
 
-// -----------------------
-// Waveform 로직 (롤백됨)
-// -----------------------
+async function checkLikeStatus(trackId) {
+    if(!likeBtn) return;
+    
+    const profile = JSON.parse(localStorage.getItem('profile'));
+    if (!profile || !profile.id) {
+        // 비로그인 시 초기화
+        likeBtn.classList.remove("liked");
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/likes/check?userId=${profile.id}&trackId=${trackId}`);
+        const data = await res.json();
+        updateLikeBtnUI(data.liked);
+    } catch(e) { console.error(e); }
+}
+
+async function toggleLike() {
+    const profile = JSON.parse(localStorage.getItem('profile'));
+    if (!profile || !profile.id) return alert("로그인이 필요합니다.");
+    
+    const trackId = window.GlobalTracks[window.globalPlayer.currentTrackIndex].id;
+
+    try {
+        const res = await fetch('http://localhost:3000/api/likes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: profile.id, trackId })
+        });
+        const data = await res.json();
+        if(res.ok) {
+            updateLikeBtnUI(data.liked);
+        }
+    } catch(e) { console.error(e); }
+}
+
+// [수정] 좋아요 UI 업데이트: 클래스 토글 방식
+function updateLikeBtnUI(isLiked) {
+    if(!likeBtn) return;
+    if (isLiked) {
+        likeBtn.classList.add("liked");
+    } else {
+        likeBtn.classList.remove("liked");
+    }
+}
+
+// --- Waveform & Canvas Utils ---
+
 function resizeCanvas() {
   if (!canvas || !ctx) return;
   const ratio = window.devicePixelRatio || 1;
@@ -212,7 +235,7 @@ function resizeCanvas() {
   ctx.scale(ratio, ratio);
 }
 
-async function calculateWaveformData(audioURL, samples = 1200) { // [복구] 100 -> 1200
+async function calculateWaveformData(audioURL, samples = 1200) {
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
@@ -241,13 +264,10 @@ async function calculateWaveformData(audioURL, samples = 1200) { // [복구] 100
 
 async function loadWaveform(audioSrc) {
     if (!canvas || !ctx) return;
-    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     waveformData = null;
 
-    // 절대 경로 변환
     const targetUrl = new URL(audioSrc, document.baseURI).href;
-
     waveformData = await calculateWaveformData(targetUrl);
     if (waveformData) {
         drawBaseWaveform(waveformData);
@@ -258,19 +278,15 @@ function drawBaseWaveform(data) {
   if (!canvas || !ctx || !data) return;
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
-  
   ctx.clearRect(0, 0, width, height);
   
   const barWidth = width / data.length;
-  ctx.fillStyle = "#eee"; // 기본 색상
+  ctx.fillStyle = "#eee"; 
 
   data.forEach((value, i) => {
-    // [디자인 복구] 높이 비율 및 여백 조정
     const barHeight = value * height * 1.5; 
     const x = i * barWidth;
     const y = height - barHeight; 
-    
-    // barWidth * 0.8 (간격 20% 확보)
     ctx.fillRect(x, y, barWidth * 0.8, barHeight);
   });
 }
@@ -279,11 +295,9 @@ function drawProgressWaveform(data, progress) {
   if (!canvas || !ctx || !data) return;
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
-  
   const barWidth = width / data.length;
   const progressIndex = Math.floor(data.length * progress);
-  
-  ctx.fillStyle = "#ff5500"; // 진행 색상 (오렌지)
+  ctx.fillStyle = "#ff5500"; 
 
   for (let i = 0; i < progressIndex; i++) {
     const barHeight = data[i] * height * 1.5;
@@ -293,9 +307,6 @@ function drawProgressWaveform(data, progress) {
   }
 }
 
-// -----------------------
-// 유틸리티
-// -----------------------
 function formatTime(seconds) {
   if (isNaN(seconds)) return "0:00";
   const m = Math.floor(seconds / 60);
@@ -333,7 +344,6 @@ function buildTracklist() {
     div.onclick = () => {
       if (idx !== GP.currentTrackIndex) {
         GP.setTrack(idx);
-        // 트랙 변경 시 즉시 파형 로드
         if(canvas) loadWaveform(tracks[idx].audioSrc);
         syncUIFromPlayer();
       } else {

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Playlist - SoundClone</title>
+  <link rel="stylesheet" href="../css/index.css">
+  <link rel="stylesheet" href="../css/track.css">
+  <link rel="stylesheet" href="../css/playlist.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo" onclick="location.href='home.html'" style="cursor:pointer;">🎵 SoundClone</div>
+    <nav>
+      <ul class="menu">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="library.html">Library</a></li>
+      </ul>
+    </nav>
+    <div class="user-buttons" id="authArea"></div>
+  </header>
+
+  <main class="main-content">
+    <div class="playlist-header">
+      <div class="playlist-cover-large">🎵</div>
+      <div class="playlist-info">
+        <span class="playlist-label">Playlist</span>
+        <h1 id="playlist-title">Loading...</h1>
+        <p id="playlist-meta">Created by You</p>
+      </div>
+    </div>
+
+    <div class="search-section">
+        <input type="text" id="track-search" placeholder="곡 제목이나 아티스트를 검색하여 추가하세요..." />
+        <div id="search-results" class="search-results-box" style="display:none;"></div>
+    </div>
+
+    <div class="tracklist-section">
+      <div id="playlist-tracks">
+        </div>
+    </div>
+  </main>
+
+  <footer class="player-bar">
+    <div class="player-bar-section">
+        <button id="footer-play-pause-btn" class="bar-btn"><span class="icon play">▶</span><span class="icon pause">⏸</span></button>
+        <span id="footer-current-time">0:00</span>
+        <input type="range" id="progress-bar" min="0" max="100" value="0" />
+        <span id="footer-duration-time">0:00</span>
+        <input type="range" id="volume-slider" min="0" max="100" value="80" />
+        <span class="volume-icon">🔊</span>
+    </div>
+  </footer>
+
+  <script src="../js/globalPlayer.js"></script>
+  <script src="../js/player.js"></script>
+  
+  <script>
+    // [중요] initPlaylistPage 로직을 전역에서 가져와 실행 (내부 스크립트 제거)
+    if (typeof window.initPlaylistPage === 'function') {
+        window.initPlaylistPage();
+    }
+  </script>
+</body>
+</html>
