@@ -8,6 +8,8 @@ body {
   color: white;
 }
 
+
+
 /* index.html의 헤더 링크 활성화 스타일 */
 .navbar .menu li a.active {
   background: rgba(255, 255, 255, 0.2);

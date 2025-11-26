@@ -5,20 +5,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.navbar {
-  width: 100%;
-  position: sticky;
-  background: #ff5500;
-  color: #fff;
-  font-weight: bold;
-  font-size: 24px;
-  padding: 8px 16px;
-  gap: 20px;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+
 
 .logo {
   font-size: 24px;
@@ -175,21 +162,12 @@ html {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.navbar {
-  background: #111;
-}
-
 .menu li a {
   color: #eee;
 }
 
 .menu li a:hover {
   background: rgba(255, 255, 255, 0.12);
-}
-
-.search-container input {
-  background: #222;
-  color: #eee;
 }
 
 .user-buttons button {

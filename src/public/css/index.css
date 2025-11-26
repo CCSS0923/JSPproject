@@ -11,17 +11,19 @@ html {
   color: #333;
 }
 
-/* 네비게이션바, 메뉴 등 기존 스타일 */
 .navbar {
-  display: flex;
-  align-items: center;
-  background: #ff5500;
+  width: 100%;
+  position: sticky;
+  background: #111111;
+  color: #fff;
+  font-weight: bold;
+  font-size: 24px;
   padding: 8px 16px;
   gap: 20px;
-  color: white;
-  position: sticky;
-  top: 0;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .menu {
@@ -53,7 +55,10 @@ html {
   padding: 6px;
   border-radius: 4px;
   border: none;
+  background: #222;
+  color: #eee;
 }
+  
 
 .search-btn {
   background: #ff7700;
