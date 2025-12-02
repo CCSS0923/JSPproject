@@ -27,12 +27,13 @@ window.renderAuth = function() {
             <button onclick="logout()" style="margin-left:8px;padding:5px 16px;border-radius:5px;background:#444;color:#fff;border:none;cursor:pointer;">Logout</button>
         `;
     } else {
-        const returnPage = location.pathname.includes('home') ? 'home.html' : 'index.html';
+        const returnPage = '/html/home.html';
+        const loginUrl = `/html/login.html?returnTo=${encodeURIComponent(returnPage)}`;
         area.innerHTML = `
             ${uploadBtnHtml}
             ${moreBtnHtml}
-            <button class="sign-in-btn" onclick="location.href='login.html?returnTo=${returnPage}'">Sign in</button>
-            <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>`;
+            <button class="sign-in-btn" onclick="location.href='${loginUrl}'">Sign in</button>
+            <button class="create-account-btn" onclick="location.href='/html/signup.html'">Create account</button>`;
     }
 };
 
@@ -40,6 +41,116 @@ window.logout = function() {
     localStorage.removeItem('profile');
     window.renderAuth();
     location.reload();
+};
+
+// ============================================================
+// 2-a. 헤더 검색창 (홈/메인 공통)
+// ============================================================
+window.initHeaderSearch = function() {
+    const searchInput = document.getElementById('header-track-search');
+    const resultsBox = document.getElementById('header-search-results');
+    if (!searchInput || !resultsBox) return;
+
+    // 이미 초기화된 경우 중복 바인딩 방지
+    if (searchInput.dataset.searchBound === 'true') return;
+    searchInput.dataset.searchBound = 'true';
+
+    let cachedTracks = (window.GlobalTracks && window.GlobalTracks.length) ? window.GlobalTracks : null;
+
+    const hideResults = () => {
+        resultsBox.style.display = 'none';
+    };
+
+    const renderResults = (tracks) => {
+        resultsBox.innerHTML = '';
+        if (!tracks || tracks.length === 0) {
+            hideResults();
+            return;
+        }
+        resultsBox.style.display = 'block';
+
+        tracks.slice(0, 12).forEach(track => {
+            const div = document.createElement('div');
+            div.className = 'search-item';
+            div.innerHTML = `
+                <img src="${track.albumCover}" onerror="this.src='../assets/albumart.jpg'">
+                <div style="flex:1">
+                    <div>${track.title}</div>
+                    <div style="font-size:12px; color:#aaa;">${track.artist}</div>
+                </div>
+                <button>Play</button>
+            `;
+            div.onclick = (e) => {
+                e.preventDefault();
+                playFromSearch(track);
+            };
+            resultsBox.appendChild(div);
+        });
+    };
+
+    const ensureTracks = async () => {
+        if (cachedTracks && cachedTracks.length) return cachedTracks;
+        if (window.GlobalTracks && window.GlobalTracks.length) {
+            cachedTracks = window.GlobalTracks;
+            return cachedTracks;
+        }
+        try {
+            const res = await fetch('http://localhost:3000/api/tracks');
+            if (res.ok) {
+                const data = await res.json();
+                window.GlobalTracks = data;
+                cachedTracks = data;
+                return data;
+            }
+        } catch (err) {
+            console.error('검색용 곡 로드 실패:', err);
+        }
+        return [];
+    };
+
+    const playFromSearch = (track) => {
+        hideResults();
+        searchInput.value = `${track.title} - ${track.artist}`;
+        window.isPlaylistMode = false;
+
+        const startPlayback = () => {
+            const idx = window.GlobalTracks.findIndex(t => t.id === track.id);
+            if (window.globalPlayer && idx !== -1) {
+                window.globalPlayer.tracks = window.GlobalTracks;
+                window.globalPlayer.setTrack(idx);
+            }
+            if (typeof navigate === 'function') {
+                navigate('/html/index.html');
+            } else {
+                window.location.href = '/html/index.html';
+            }
+        };
+
+        if (!window.GlobalTracks || window.GlobalTracks.length === 0) {
+            fetchTracks(true).then(startPlayback).catch(startPlayback);
+        } else {
+            startPlayback();
+        }
+    };
+
+    searchInput.addEventListener('input', async (e) => {
+        const val = e.target.value.trim().toLowerCase();
+        if (val.length < 1) { hideResults(); return; }
+
+        const tracks = await ensureTracks();
+        const filtered = tracks.filter(t =>
+            (t.title || '').toLowerCase().includes(val) ||
+            (t.artist || '').toLowerCase().includes(val)
+        );
+        renderResults(filtered);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (resultsBox.style.display === 'none') return;
+        if (!resultsBox.contains(e.target) && e.target !== searchInput) {
+            hideResults();
+        }
+    });
 };
 
 
@@ -56,7 +167,16 @@ window.renderHomeTracks = async function(tracks) {
 
     const newUploads = tracks.filter(t => !playedList.includes(t.id));
     renderSection('new-uploads-container', newUploads, true);
-    renderSection('recent-container', tracks.slice(0, 3), false);
+
+    const recentContainer = document.getElementById('recent-container');
+    if (recentContainer) {
+        if (profile && profile.id) {
+            recentContainer.innerHTML = '<div style="padding: 20px; color: #888;">최근 재생 기록을 불러오는 중...</div>';
+            renderRecentPlays(profile.id);
+        } else {
+            recentContainer.innerHTML = '<div style="padding: 20px; color: #888;">로그인 후 이용 가능합니다.</div>';
+        }
+    }
 
     if (profile && profile.id) {
         try {
@@ -89,8 +209,10 @@ window.renderHomeTracks = async function(tracks) {
 
                 myPlaylists.forEach(pl => {
                     html += `
-                    <a class="card" href="playlist.html?id=${pl.id}">
-                        <div class="card-cover" style="background:#222; display:flex; align-items:center; justify-content:center; font-size:40px;">🎵</div>
+                    <a class="card" href="/html/playlist.html?id=${pl.id}">
+                        <div class="card-cover">
+                            <img src="${pl.cover || '../assets/albumart.jpg'}" alt="${pl.title}" onerror="this.src='../assets/albumart.jpg'" />
+                        </div>
                         <div class="card-title">${pl.title}</div>
                         <div class="card-artist">By ${profile.name}</div>
                     </a>`;
@@ -102,6 +224,22 @@ window.renderHomeTracks = async function(tracks) {
         } else {
             playlistContainer.innerHTML = '<div style="padding:20px; color:#888;">로그인 후 이용 가능합니다.</div>';
         }
+    }
+
+    const followingContainer = document.getElementById('following-container');
+    if (followingContainer) {
+        if (profile && profile.id) {
+            followingContainer.innerHTML = '<div style="padding: 20px; color: #888;">팔로우 아티스트를 불러오는 중...</div>';
+            renderHomeFollowing(profile.id);
+        } else {
+            followingContainer.innerHTML = '<div style="padding:20px; color:#888;">로그인 후 이용 가능합니다.</div>';
+        }
+    }
+
+    const popularContainer = document.getElementById('popular-artists-container');
+    if (popularContainer) {
+        popularContainer.innerHTML = '<div style="padding: 20px; color: #888;">Loading popular artists...</div>';
+        renderPopularArtists();
     }
 };
 
@@ -148,7 +286,7 @@ function renderSection(containerId, trackList, showDeleteBtn) {
 
         const card = document.createElement('a');
         card.className = 'card';
-        card.href = 'index.html'; 
+        card.href = '/html/index.html'; 
         
         card.onclick = (e) => {
             e.preventDefault(); 
@@ -162,7 +300,11 @@ function renderSection(containerId, trackList, showDeleteBtn) {
                     window.globalPlayer.tracks = window.GlobalTracks;
                     window.globalPlayer.setTrack(targetIndex);
                 }
-                navigate('index.html');
+                if (typeof navigate === 'function') {
+                    navigate('/html/index.html');
+                } else {
+                    window.location.href = '/html/index.html';
+                }
             });
         };
 
@@ -179,6 +321,135 @@ function renderSection(containerId, trackList, showDeleteBtn) {
     });
 }
 
+async function renderRecentPlays(userId) {
+    const container = document.getElementById('recent-container');
+    if (!container) return;
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/users/${userId}/recent-plays`);
+        if (!res.ok) throw new Error('Failed to load recent plays');
+        const recentTracks = await res.json();
+
+        if (!recentTracks || recentTracks.length === 0) {
+            container.innerHTML = '<div style="padding: 20px; color: #888;">최근 재생한 곡이 없습니다.</div>';
+            return;
+        }
+
+        renderSection('recent-container', recentTracks, false);
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div style="padding: 20px; color: #e66;">최근 재생 목록을 불러오지 못했습니다.</div>';
+    }
+}
+
+async function renderHomeFollowing(userId) {
+    const container = document.getElementById('following-container');
+    if (!container) return;
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/users/${userId}/following`);
+        if (!res.ok) throw new Error('Failed to load following');
+        const list = await res.json();
+
+        if (!list || !list.length) {
+            container.innerHTML = '<div style="padding:20px; color:#888;">팔로우한 아티스트가 없습니다.</div>';
+            return;
+        }
+
+        container.innerHTML = '';
+        list.forEach(item => {
+            const card = document.createElement('a');
+            card.className = 'card';
+            card.href = '#';
+            card.onclick = (e) => {
+                e.preventDefault();
+                openArtistTracks(item.artist);
+            };
+            card.innerHTML = `
+                <div class="card-cover">
+                    <img src="${item.albumCover}" alt="${item.artist}" onerror="this.src='../assets/default_profile.jpg'" />
+                </div>
+                <div class="card-title">${item.artist}</div>
+                <div class="card-artist">Following</div>
+            `;
+            container.appendChild(card);
+        });
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = '<div style="padding:20px; color:#e66;">팔로잉 목록을 불러오지 못했습니다.</div>';
+    }
+}
+
+function openArtistTracks(artist) {
+    // 홈 섹션이 비어 있지 않도록 항상 트랙 재로딩 후 렌더
+    window.isPlaylistMode = false;
+    fetchTracks(true).then(() => {
+        if (typeof window.renderHomeTracks === 'function') {
+            window.renderHomeTracks(window.GlobalTracks);
+        }
+        if (typeof window.showArtistTracks === 'function') {
+            window.showArtistTracks(artist);
+        } else if (typeof navigate === 'function') {
+            navigate('/html/index.html');
+        } else {
+            window.location.href = '/html/index.html';
+        }
+    }).catch((err) => {
+        console.error(err);
+        if (typeof window.showArtistTracks === 'function') {
+            window.showArtistTracks(artist);
+        }
+    });
+}
+
+async function renderPopularArtists() {
+    const container = document.getElementById('popular-artists-container');
+    if (!container) return;
+
+    try {
+        const res = await fetch('http://localhost:3000/api/artists/popular?limit=8');
+        if (!res.ok) throw new Error('failed to load popular artists');
+        const artists = await res.json();
+
+        if (!artists || artists.length === 0) {
+            container.innerHTML = '<div style="padding: 20px; color: #888;">아직 재생된 아티스트가 없습니다.</div>';
+            return;
+        }
+
+        container.innerHTML = '';
+        artists.forEach(artist => {
+            const card = document.createElement('a');
+            card.className = 'card';
+            card.href = '/html/index.html';
+            card.onclick = (e) => {
+                e.preventDefault();
+                window.isPlaylistMode = false;
+                fetchTracks(true).then(() => {
+                    const idx = window.GlobalTracks.findIndex(t => t.artist === artist.artist);
+                    if (window.globalPlayer && idx !== -1) {
+                        window.globalPlayer.tracks = window.GlobalTracks;
+                        window.globalPlayer.setTrack(idx);
+                    }
+                navigate('/html/index.html');
+            });
+        };
+
+            card.innerHTML = `
+                <div class="card-cover">
+                    <img src="${artist.albumCover}" alt="${artist.artist}" onerror="this.src='../assets/albumart.jpg'" />
+                </div>
+                <div class="card-title">${artist.artist}</div>
+                <div class="card-artist">Total plays: ${artist.totalPlays}</div>
+            `;
+
+            container.appendChild(card);
+        });
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div style="padding: 20px; color: #e66;">인기 아티스트를 불러오지 못했습니다.</div>';
+    }
+}
+
 window.createNewPlaylist = async function() {
     const profile = JSON.parse(localStorage.getItem('profile'));
     if (!profile) return alert('로그인이 필요합니다.');
@@ -193,11 +464,27 @@ window.createNewPlaylist = async function() {
         });
         if (res.ok) {
             const data = await res.json();
-            location.href = `playlist.html?id=${data.id}`;
+            location.href = `/html/playlist.html?id=${data.id}`;
         } else {
             alert('생성 실패');
         }
     } catch (e) {
+        console.error(e);
+        alert('오류 발생');
+    }
+};
+
+window.deletePlaylist = async function(id) {
+    if(!confirm('플레이리스트를 삭제하시겠습니까?')) return;
+    try {
+        const res = await fetch(`http://localhost:3000/api/playlists/${id}`, { method: 'DELETE' });
+        if(res.ok) {
+            alert('플레이리스트가 삭제되었습니다.');
+            location.href = '/html/home.html';
+        } else {
+            alert('삭제 실패');
+        }
+    } catch(e) {
         console.error(e);
         alert('오류 발생');
     }
@@ -232,7 +519,7 @@ window.initPlaylistPage = function() {
 
     if (typeof window.renderAuth === 'function') window.renderAuth();
     const profile = JSON.parse(localStorage.getItem('profile'));
-    if (!profile) { alert('로그인이 필요합니다.'); location.href = 'login.html'; return; }
+    if (!profile) { alert('로그인이 필요합니다.'); location.href = '/html/login.html'; return; }
 
     const urlParams = new URLSearchParams(window.location.search);
     const playlistId = urlParams.get('id');
@@ -240,6 +527,10 @@ window.initPlaylistPage = function() {
 
     const searchInput = document.getElementById('track-search');
     const resultsBox = document.getElementById('search-results');
+    const deleteBtn = document.getElementById('delete-playlist-btn');
+    if (deleteBtn) {
+        deleteBtn.onclick = () => deletePlaylist(playlistId);
+    }
 
     const loadPlaylistData = async () => {
         try {
@@ -250,6 +541,11 @@ window.initPlaylistPage = function() {
 
             document.getElementById('playlist-title').textContent = data.title;
             document.getElementById('playlist-meta').textContent = `${data.tracks.length} tracks · Created by ${profile.name}`;
+            const coverEl = document.querySelector('.playlist-cover-large');
+            if (coverEl) {
+                const cover = data.cover || (data.tracks[0] && data.tracks[0].albumCover) || '../assets/albumart.jpg';
+                coverEl.innerHTML = `<img src="${cover}" alt="${data.title}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" onerror="this.src='../assets/albumart.jpg'"/>`;
+            }
             
             currentPlaylistTracks = data.tracks;
             renderPlaylistTracks(data.tracks);
@@ -448,8 +744,17 @@ if (!window.globalPlayer) {
                 const tracks = JSON.parse(playlistTracksRaw);
                 if (tracks.length > 0) {
                     this.tracks = tracks;
+                    window.GlobalTracks = tracks;
                     this.currentTrackIndex = parseInt(startIndex) || 0;
                     window.isPlaylistMode = true;
+                    window.dispatchEvent(new Event('tracksLoaded'));
+
+                    // 플레이어 초기 세팅 (자동재생 없이 소스만 바인딩)
+                    if (!this.audio.src && this.tracks[this.currentTrackIndex]) {
+                        this.audio.src = this.tracks[this.currentTrackIndex].audioSrc;
+                        this.audio.currentTime = 0;
+                        this.saveState();
+                    }
                     
                     // 세션 데이터 사용 후 제거
                     sessionStorage.removeItem(window.PLAYLIST_SESSION_KEY);
@@ -577,6 +882,18 @@ if (!window.globalPlayer) {
   window.globalPlayer = gp;
   gp.init();
 }
+
+// 헤더 검색창 초기화 (페이지 로드 시 1회)
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.initHeaderSearch === 'function') {
+        window.initHeaderSearch();
+    }
+});
+window.addEventListener('tracksLoaded', () => {
+    if (typeof window.initHeaderSearch === 'function') {
+        window.initHeaderSearch();
+    }
+});
 
 // 초기 실행
 fetchTracks();

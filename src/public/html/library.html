@@ -1,105 +1,89 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>SoundClone Library</title>
-  <link rel="stylesheet" href="../css/index.css" />
-  <link rel="stylesheet" href="../css/library.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>SoundClone Library</title>
+    <!-- CSS는 항상 서버 루트 기준 절대 경로로 -->
+    <link rel="stylesheet" href="/css/index.css" />
+    <link rel="stylesheet" href="/css/library.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
+
 <body>
-  <header class="navbar">
-    <div class="logo">🎵 SoundClone</div>
-    <nav>
-      <ul class="menu">
-        <li><a href="home.html">Home</a></li>
-        <li><a href="library.html" class="active">Library</a></li>
-      </ul>
+    <header class="navbar">
+        <a class="logo" href="/html/home.html">🎵 SoundClone</a>
+        <nav>
+            <ul class="menu">
+                <!-- 이 페이지의 실제 URL: /html/library.html 기준 -->
+                <!-- 상대경로 "html/..." 쓰면 /html/html/... 이 되어버려서 절대경로로 고정 -->
+                <li><a href="/html/home.html">Home</a></li>
+                <li><a href="/html/library.html" class="active">Library</a></li>
+            </ul>
+        </nav>
+        <div class="search-container">
+            <div class="search-box">
+                <input id="header-track-search" type="text" placeholder="Search for artists, bands, tracks, podcasts" />
+                <button class="search-btn">🔍</button>
+                <div id="header-search-results" class="search-results-box" style="display:none;"></div>
+            </div>
+        </div>
+        <!-- authArea id 추가해두면 globalPlayer.js의 renderAuth가 여기 내용을 덮어씀 -->
+        <div class="user-buttons" id="authArea"></div>
+    </header>
+
+    <nav class="library-nav">
+        <ul class="library-tabs">
+            <!-- 이 페이지는 /html/library.html 이고,
+           하위 페이지들은 /html/library/*.html 이니까 전부 절대경로로 -->
+            <li><a href="/html/library.html" class="tab-active">Overview</a></li>
+            <li><a href="/html/library/likes.html">Likes</a></li>
+            <li><a href="/html/library/playlists.html">Playlists</a></li>
+            <li><a href="/html/library/albums.html">Albums</a></li>
+            <li><a href="/html/library/following.html">Following</a></li>
+            <li><a href="/html/library/history.html">History</a></li>
+        </ul>
     </nav>
-    <div class="search-container">
-      <input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
-      <button class="search-btn">🔍</button>
-    </div>
-    <div class="user-buttons">
-      <button class="sign-in-btn" 
-              onclick="sessionStorage.setItem('loginRedirectUrl', window.location.href); location.href='login.html';">
-        Sign in
-      </button>
-      <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
-      <button class="upload-btn" onclick="location.href='upload.html'">Upload</button>
-      <button class="more-btn">•••</button>
-    </div>
-  </header>
 
-  <nav class="library-nav">
-    <ul class="library-tabs">
-      <li><a href="library.html" class="tab-active">Overview</a></li>
-      <li><a href="library\likes.html">Likes</a></li>
-      <li><a href="library\playlists.html">Playlists</a></li>
-      <li><a href="library\albums.html">Albums</a></li>
-      <li><a href="library\following.html">Following</a></li>
-      <li><a href="library\history.html">History</a></li>
-    </ul>
-  </nav>
-
-  <main class="library-content">
-    
-    <section class="content-section">
-      <h2 class="section-title">Likes</h2>
-      <div class="album-row">
-        <a href="index.html" class="album-link">
-          <div class="album-cover-container">
-            <img src="../assets/albumart.jpg" alt="Album Cover" class="album-cover-img" />
-            <div class="album-overlay">
-              <span class="play-btn">▶</span>
-            </div>
-          </div>
-          <div class="album-caption">Kairikibear - Darling Dance</div>
-          <div class="album-artist">Kairikibear</div>
-        </a>
-        <a href="#" class="album-link">
-          <div class="album-cover-container">
-            <img src="../assets/sample2_album.jpg" alt="Album Cover" class="album-cover-img" />
-            <div class="album-overlay">
-              <span class="play-btn">▶</span>
-            </div>
-          </div>
-          <div class="album-caption">두번째 곡 예시</div>
-          <div class="album-artist">artist 2</div>
-        </a>
-        </div>
-    </section>
-
-    <section class="content-section">
-      <h2 class="section-title">Following</h2>
-      <div class="user-row">
-        <a href="#" class="user-card">
-          <div class="user-avatar">
-            <img src="../assets/artist.jpg" alt="Artist Avatar" />
-          </div>
-          <div class="user-name">Kairikibear</div>
-          <div class="user-followers">100K Followers</div>
-        </a>
-        <a href="#" class="user-card">
-          <div class="user-avatar">
-            <img src="../assets/default_profile.jpg" alt="Artist Avatar" />
-          </div>
-          <div class="user-name">Another Artist</div>
-          <div class="user-followers">20K Followers</div>
-        </a>
-        </div>
-    </section>
-
+    <!-- router.js가 교체하는 영역 -->
+    <main class="main-content library-content">
+        <section class="content-section">
+            <h2 class="section-title">Recently Played</h2>
+            <div class="album-row" id="library-overview-recent"></div>
+        </section>
+        <section class="content-section">
+            <h2 class="section-title">Your Likes</h2>
+            <div class="album-row" id="library-overview-likes"></div>
+        </section>
+        <section class="content-section">
+            <h2 class="section-title">Your Playlists</h2>
+            <div class="album-row" id="library-overview-playlists"></div>
+        </section>
+        <section class="content-section">
+            <h2 class="section-title">Albums</h2>
+            <div class="album-row" id="library-overview-albums"></div>
+        </section>
+        <section class="content-section">
+            <h2 class="section-title">Following</h2>
+            <div class="user-row" id="library-overview-following"></div>
+        </section>
     </main>
 
-  <footer class="library-footer">
-    <a href="#">Legal</a> · 
-    <a href="#">Privacy</a> · 
-    <a href="#">Cookie Policy</a> · 
-    <a href="#">Cookie Manager</a> · 
-    <a href="#">Imprint</a> · 
-    <a href="#">Artist Resources</a> · 
+    <!-- <footer class="library-footer">
+    <a href="#">Legal</a> ·
+    <a href="#">Privacy</a> ·
+    <a href="#">Cookie Policy</a> ·
+    <a href="#">Cookie Manager</a> ·
+    <a href="#">Imprint</a> ·
+    <a href="#">Artist Resources</a> ·
     <a href="#">Charts</a>
-  </footer>
+  </footer> -->
+
+    <!-- JS: 이미 잘 돼 있던 부분은 그대로 유지 -->
+    <script src="/js/router.js"></script>
+    <script src="/js/globalPlayer.js"></script>
+    <script src="/js/library.js"></script>
+    <script src="/js/player.js"></script>
 </body>
+
 </html>

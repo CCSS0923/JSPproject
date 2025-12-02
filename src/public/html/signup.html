@@ -1,87 +1,90 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <meta charset="UTF-8">
-  <title>회원가입</title>
-  <link rel="stylesheet" href="../css/signup.css">
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <link rel="stylesheet" href="/css/signup.css">
 </head>
+
 <body>
-  <div class="signup-container">
-    <h2>회원가입</h2>
-    <form id="signupForm" autocomplete="off">
-      <label for="email">이메일</label>
-      <input type="email" id="email" name="email" required />
-      
-      <label for="username">아이디</label>
-      <input type="text" id="username" name="username" required />
-      
-      <label for="nickname">닉네임</label>
-      <input type="text" id="nickname" name="nickname" required />
-      
-      <label for="password">비밀번호</label>
-      <input type="password" id="password" name="password" required />
-      
-      <label for="confirmPassword">비밀번호 확인</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" required />
-      
-      <button type="submit">가입하기</button>
-    </form>
-    <div id="signup-error" style="color: #e66; margin-top: 8px;"></div>
-    <div class="login-link">
-      <a href="login.html">이미 계정이 있으신가요? 로그인</a>
+    <div class="signup-container">
+        <h2>회원가입</h2>
+        <form id="signupForm" autocomplete="off">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" required />
+
+            <label for="username">아이디</label>
+            <input type="text" id="username" name="username" required />
+
+            <label for="nickname">닉네임</label>
+            <input type="text" id="nickname" name="nickname" required />
+
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" required />
+
+            <label for="confirmPassword">비밀번호 확인</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required />
+
+            <button type="submit">가입하기</button>
+        </form>
+        <div id="signup-error" style="color: #e66; margin-top: 8px;"></div>
+        <div class="login-link">
+            <a href="/html/login.html">이미 계정이 있으신가요? 로그인</a>
+        </div>
     </div>
-  </div>
 
-  <script>
-    document.getElementById('signupForm').onsubmit = async function(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('email').value.trim();
-      const username = document.getElementById('username').value.trim();
-      const nickname = document.getElementById('nickname').value.trim();
-      const password = document.getElementById('password').value;
-      
-      // 비밀번호 확인 필드 값 가져오기
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      
-      const errorBox = document.getElementById('signup-error');
-      errorBox.textContent = "";
-      
-      // 모든 필드 검증
-      if (!email || !username || !nickname || !password || !confirmPassword) {
-        errorBox.textContent = "모든 필드를 입력하세요.";
-        return;
-      }
-      
-      // --- 비밀번호 일치 확인 로직 추가 ---
-      if (password !== confirmPassword) {
-        errorBox.textContent = "비밀번호가 일치하지 않습니다.";
-        return; // 일치하지 않으면 서버 전송 차단
-      }
-      // ------------------------------------
+    <script>
+        document.getElementById('signupForm').onsubmit = async function (e) {
+            e.preventDefault();
 
-      try {
-        const response = await fetch('http://localhost:3000/api/users/signup', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          // 서버에는 'password'만 전송 (confirmPassword는 불필요)
-          body: JSON.stringify({ 
-            email: email, 
-            username: username, 
-            nickname: nickname,
-            password: password 
-          })
-        });
-        const result = await response.json();
-        if (response.ok) {
-          location.href = "login.html";
-        } else {
-          errorBox.textContent = result.message || "회원가입 실패";
-        }
-      } catch (e) {
-        errorBox.textContent = "서버 오류가 발생했습니다.";
-      }
-    };
-  </script>
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const nickname = document.getElementById('nickname').value.trim();
+            const password = document.getElementById('password').value;
+
+            // 비밀번호 확인 필드 값 가져오기
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            const errorBox = document.getElementById('signup-error');
+            errorBox.textContent = "";
+
+            // 모든 필드 검증
+            if (!email || !username || !nickname || !password || !confirmPassword) {
+                errorBox.textContent = "모든 필드를 입력하세요.";
+                return;
+            }
+
+            // --- 비밀번호 일치 확인 로직 추가 ---
+            if (password !== confirmPassword) {
+                errorBox.textContent = "비밀번호가 일치하지 않습니다.";
+                return; // 일치하지 않으면 서버 전송 차단
+            }
+            // ------------------------------------
+
+            try {
+                const response = await fetch('http://localhost:3000/api/users/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // 서버에는 'password'만 전송 (confirmPassword는 불필요)
+                    body: JSON.stringify({
+                        email: email,
+                        username: username,
+                        nickname: nickname,
+                        password: password
+                    })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    location.href = "/html/login.html";
+                } else {
+                    errorBox.textContent = result.message || "회원가입 실패";
+                }
+            } catch (e) {
+                errorBox.textContent = "서버 오류가 발생했습니다.";
+            }
+        };
+    </script>
 </body>
+
 </html>

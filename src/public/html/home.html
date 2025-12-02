@@ -2,74 +2,78 @@
 <html lang="ko">
 
 <head>
-	<meta charset="UTF-8" />
-	<title>SoundClone Home</title>
-	<link rel="stylesheet" href="../css/index.css" />
-	<link rel="stylesheet" href="../css/home.css" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>SoundClone Home</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
 <body>
-	<header class="navbar">
-		<div class="logo">🎵 SoundClone</div>
-		<nav>
-			<ul class="menu">
-				<li><a href="home.html">Home</a></li>
-				<li><a href="library.html">Library</a></li>
-			</ul>
-		</nav>
-		<div class="search-container">
-			<input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
-			<button class="search-btn">🔍</button>
-		</div>
-		<div class="user-buttons" id="authArea">
-			</div>
-	</header>
+    <header class="navbar">
+        <div class="logo">🎵 SoundClone</div>
+        <nav>
+            <ul class="menu">
+                <li><a href="/html/home.html">Home</a></li>
+                <li><a href="/html/library.html">Library</a></li>
+            </ul>
+        </nav>
+        <div class="search-container">
+            <div class="search-box">
+                <input id="header-track-search" type="text" placeholder="Search for artists, bands, tracks, podcasts" />
+                <button class="search-btn">🔍</button>
+                <div id="header-search-results" class="search-results-box" style="display:none;"></div>
+            </div>
+        </div>
+        <div class="user-buttons" id="authArea">
+        </div>
+    </header>
 
-	<main class="main-content">
-		
-		<section class="home-section">
-			<h2 class="section-title">New Uploads</h2>
-			<div class="card-row" id="new-uploads-container">
-				<div style="padding: 20px; color: #888;">Loading...</div>
-			</div>
-		</section>
+    <main class="main-content">
 
-		<section class="home-section">
-			<h2 class="section-title">Recently Played</h2>
-			<div class="card-row" id="recent-container">
-				</div>
-		</section>
+        <section class="home-section">
+            <h2 class="section-title">New Uploads</h2>
+            <div class="card-row" id="new-uploads-container">
+                <div style="padding: 20px; color: #888;">Loading...</div>
+            </div>
+        </section>
 
-		<section class="home-section">
-			<h2 class="section-title">Liked by You</h2>
-			<div class="card-row" id="liked-container">
-				<div style="padding: 20px; color: #888;">Loading...</div>
-			</div>
-		</section>
+        <section class="home-section">
+            <h2 class="section-title">Recently Played</h2>
+            <div class="card-row" id="recent-container">
+            </div>
+        </section>
 
-		<section class="home-section">
-			<h2 class="section-title">Your Playlists</h2>
-			<div class="card-row" id="playlist-container">
-				<div style="padding: 20px; color: #888;">Loading...</div>
-			</div>
-		</section>
+        <section class="home-section">
+            <h2 class="section-title">Liked by You</h2>
+            <div class="card-row" id="liked-container">
+                <div style="padding: 20px; color: #888;">Loading...</div>
+            </div>
+        </section>
 
-		<section class="home-section">
-			<h2 class="section-title">Popular Artists</h2>
-			<div class="card-row">
-				<a class="card" href="javascript:void(0)">
-					<div class="card-cover">
-						<img src="../assets/artist.jpg" alt="Artist" onerror="this.src='../assets/default_profile.jpg'" />
-					</div>
-					<div class="card-title">Kairikibear</div>
-					<div class="card-artist">Popular artist</div>
-				</a>
-			</div>
-		</section>
-	</main>
+        <section class="home-section">
+            <h2 class="section-title">Your Playlists</h2>
+            <div class="card-row" id="playlist-container">
+                <div style="padding: 20px; color: #888;">Loading...</div>
+            </div>
+        </section>
 
-	<footer class="player-bar">
+        <section class="home-section">
+            <h2 class="section-title">Following Artists</h2>
+            <div class="card-row" id="following-container">
+                <div style="padding: 20px; color: #888;">Loading...</div>
+            </div>
+        </section>
+
+        <section class="home-section">
+            <h2 class="section-title">Popular Artists</h2>
+            <div class="card-row" id="popular-artists-container">
+                <div style="padding: 20px; color: #888;">Loading...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="player-bar">
 		<div class="player-bar-section">
 			<button id="footer-play-pause-btn" class="bar-btn" aria-label="Play/Pause">
 				<span class="icon play">▶</span>
@@ -83,8 +87,10 @@
 		</div>
 	</footer>
 
-	<script src="../js/router.js"></script>
-	<script src="../js/globalPlayer.js"></script>
-	<script src="../js/player.js"></script>
+    <script src="/js/router.js"></script>
+    <script src="/js/globalPlayer.js"></script>
+    <script src="/js/library.js"></script>
+    <script src="/js/player.js"></script>
 </body>
+
 </html>

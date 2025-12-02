@@ -2,12 +2,6 @@
   - index.css와 home.css의 스타일을 일부 보완합니다. 
 */
 
-body {
-  /* home.css와 유사하게 어두운 배경 적용 */
-  background: #181818;
-  color: white;
-}
-
 /* index.html의 헤더 링크 활성화 스타일 */
 .navbar .menu li a.active {
   background: rgba(255, 255, 255, 0.2);
@@ -135,15 +129,19 @@ body {
   color: #fff;
   font-size: 15px;
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 
 .album-artist {
   color: #aaa;
   font-size: 14px;
   margin-top: 4px;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 

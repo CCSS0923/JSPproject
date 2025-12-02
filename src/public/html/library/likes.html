@@ -2,50 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="../../css/index.css" />
-    <link rel="stylesheet" href="../../css/library.css" />
+    <link rel="stylesheet" href="/css/index.css" />
+    <link rel="stylesheet" href="/css/library.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
 <body>
     <header class="navbar">
-    <div class="logo">🎵 SoundClone</div>
+    <a class="logo" href="/html/home.html">🎵 SoundClone</a>
     <nav>
       <ul class="menu">
-        <li><a href="../home.html">Home</a></li>
-        <li><a href="../library.html" class="active">Library</a></li>
+        <li><a href="/html/home.html">Home</a></li>
+        <li><a href="/html/library.html" class="active">Library</a></li>
       </ul>
     </nav>
     <div class="search-container">
-      <input type="text" placeholder="Search for artists, bands, tracks, podcasts" />
-      <button class="search-btn">🔍</button>
+      <div class="search-box">
+        <input id="header-track-search" type="text" placeholder="Search for artists, bands, tracks, podcasts" />
+        <button class="search-btn">🔍</button>
+        <div id="header-search-results" class="search-results-box" style="display:none;"></div>
+      </div>
     </div>
-    <div class="user-buttons">
-      <button class="sign-in-btn" 
-              onclick="sessionStorage.setItem('loginRedirectUrl', window.location.href); location.href='login.html';">
-        Sign in
-      </button>
-      <button class="create-account-btn" onclick="location.href='signup.html'">Create account</button>
-      <button class="upload-btn" onclick="location.href='upload.html'">Upload</button>
-      <button class="more-btn">•••</button>
-    </div>
+    <div class="user-buttons" id="authArea"></div>
   </header>
 
     <nav class="library-nav">
-        <ul class="library-tabs">
-        <li><a href="../library.html">Overview</a></li>
-        <li><a href="likes.html" class="tab-active">Likes</a></li>
-        <li><a href="playlists.html">Playlists</a></li>
-        <li><a href="albums.html">Albums</a></li>
-        <li><a href="following.html">Following</a></li>
-        <li><a href="history.html">History</a></li>
-    </ul>
+      <ul class="library-tabs">
+        <li><a href="/html/library.html">Overview</a></li>
+        <li><a href="/html/library/likes.html" class="tab-active">Likes</a></li>
+        <li><a href="/html/library/playlists.html">Playlists</a></li>
+        <li><a href="/html/library/albums.html" >Albums</a></li>
+        <li><a href="/html/library/following.html">Following</a></li>
+        <li><a href="/html/library/history.html">History</a></li>
+      </ul>
+    </nav>
 
-    <section class="content-section">
-        <h2>asdf</h2>
-    </section>
-
-    <footer class="library-footer">
+    <main class="main-content library-content">
+      <section class="content-section">
+          <h2 class="section-title">Liked Tracks</h2>
+          <div class="album-row" id="library-likes-list"></div>
+      </section>
+    </main>
+    <!-- <footer class="library-footer">
     <a href="#">Legal</a> · 
     <a href="#">Privacy</a> · 
     <a href="#">Cookie Policy</a> · 
@@ -53,6 +51,11 @@
     <a href="#">Imprint</a> · 
     <a href="#">Artist Resources</a> · 
     <a href="#">Charts</a>
-  </footer>
+  </footer> -->
+
+  <script src="/js/router.js"></script>
+	<script src="/js/globalPlayer.js"></script>
+  <script src="/js/library.js"></script>
+	<script src="/js/player.js"></script>
 </body>
 </html>

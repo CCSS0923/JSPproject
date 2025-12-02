@@ -16,16 +16,20 @@ let likeBtn;
 let isSeeking = false;
 
 window.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById("waveform")) {
+    if (hasPlayerElements()) {
         initPlayerPage();
     }
 });
 
 window.addEventListener('tracksLoaded', () => {
-    if (document.getElementById("waveform")) {
+    if (hasPlayerElements()) {
         initPlayerPage();
     }
 });
+
+function hasPlayerElements() {
+    return document.getElementById("waveform") || document.getElementById("footer-play-pause-btn");
+}
 
 function initPlayerPage() {
     if (!window.globalPlayer) return;
@@ -130,7 +134,7 @@ function bindEvents() {
 }
 
 function syncUIFromPlayer() {
-    const tracks = window.GlobalTracks;
+    const tracks = (GP.tracks && GP.tracks.length) ? GP.tracks : window.GlobalTracks;
     if (!tracks || !tracks.length) return;
 
     const idx = GP.currentTrackIndex;
@@ -325,7 +329,7 @@ function highlightActiveTrack(activeIdx) {
 function buildTracklist() {
   if (!tracklistContainer) return;
   tracklistContainer.innerHTML = "";
-  const tracks = window.GlobalTracks || [];
+  const tracks = (GP.tracks && GP.tracks.length) ? GP.tracks : (window.GlobalTracks || []);
 
   tracks.forEach((track, idx) => {
     const div = document.createElement("div");
